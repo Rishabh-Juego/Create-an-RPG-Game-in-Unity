@@ -11,6 +11,9 @@ Course Link:
 ##### Game
 Information about the game:
 - Game is a 3d RPG    
+- We are using Navmesh for AI pathfinding.
+  - We are using point to move system for player movement.
+- 
 
 ##### Assets
 Assets used in the project:
@@ -33,4 +36,18 @@ Packages:
 What changes are needed based on platform:
 - We are *using Linear color space*, so if the target device is low end/old phones, we might have to change color and textures while changing color space to 'Gamma'.
 - For *Mobile (Android/iOS)* **Fast sRGB/Linear Conversion:** In your *URP Asset* (under Post-processing), there is an option for *Fast sRGB/Linear Conversion*. "Enable this". It uses an approximation that is much faster on mobile GPUs with almost zero visual difference.
+
+
+### Systems
+#### Player Movement
+Using the namespace `TGL.RPG.Navigation.PTM`(Point To Move) for player movement.
+- Player movement is done using Navmesh and raycasting.
+- Player clicks on the ground to move to that position.
+- `PlayerAnimationController.cs` is used to control the player animations based on movement.
+- `AutoBraking` is turned off, so character does not slow down when approaching the target point.
+
+#### Constants
+- All constant values are stored in `GameConstants.cs` file.
+- We made multiple partial classes for `GameConstants.cs` file to organize constants based on their usage.
+  - see `GameConstants.PlayerAnimConstants` class for understanding.
 
