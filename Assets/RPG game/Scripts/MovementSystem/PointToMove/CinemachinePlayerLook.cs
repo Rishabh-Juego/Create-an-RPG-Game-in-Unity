@@ -9,16 +9,26 @@ namespace TGL.RPG.Navigation.PTM
     public class CinemachinePlayerLook : MonoBehaviour
     {
         [SerializeField] private CinemachineCamera playerCamera;
-        [SerializeField] private bool useScreenEdgeLook; 
-        private CinemachinePositionComposer camPosComposer;
+        // Horizontal angle limits,
+        [Header("Horizontal"), SerializeField, Range(-179.9f, 179.99f)] private float horizontalMinLimit;
+        [SerializeField, Range(-179.9f, 179.99f)] private float horizontalMaxLimit;
+        [SerializeField] private bool horizontalNoLimit;
         
-        private Vector3 currOffset; // currPos
-        private Vector3 mousePos; // pos
+        // Vertical angle limits
+        [Header("Vertical"), SerializeField, Range(-10f, 45f)] private float verticalMinLimit, verticalMaxLimit;
+        // Zoom distance limits
+        [Header("Zoom"), SerializeField, Range(2f, 15f)] private float zoomMinLimit, zoomMaxLimit;
+        [Header("Zoom"), SerializeField, Range(0.1f, 1.5f)] private float zoomSensitivity = 1f;
+        
+        private CinemachineOrbitalFollow orbitalFollow;
+        private float currHorizontalAngle, currVerticalAngle, currZoomDistance;
         
         // screen details
         private Coroutine ValidateScreenDimensionsCoroutine;
         private float halfScreenWidth;
         private float halfScreenHeight;
+
+        #region MonoBehaviourMethods
 
         private void Awake()
         {
@@ -28,30 +38,77 @@ namespace TGL.RPG.Navigation.PTM
                 return;
             }
             
-            // get the  'CinemachinePositionComposer' from the 'Body' stage of the Cinemachine Camera
-            camPosComposer = playerCamera.GetCinemachineComponent(CinemachineCore.Stage.Body) as CinemachinePositionComposer;
+            // get the  'CinemachineOrbitalFollow' from the 'Body' stage of the Cinemachine Camera
+            orbitalFollow = playerCamera.GetCinemachineComponent(CinemachineCore.Stage.Body) as CinemachineOrbitalFollow;
 
-            if (camPosComposer == null)
+            if (orbitalFollow == null)
             {
-                Debug.LogError($"No 'CinemachinePositionComposer' found in {playerCamera.name}, are we still using 'PositionControl: PositionComposer' in the inspector?", playerCamera);
+                Debug.LogError($"No 'CinemachineOrbitalFollow' found in {playerCamera.name}, are we still using 'PositionControl: Orbital Follow' in the inspector?", playerCamera);
             }
             else
             {
-                currOffset = camPosComposer.TargetOffset; // offset from the target which we want to track using the camera, we do not track the target directly, but rather the offset from it
+                currHorizontalAngle = orbitalFollow.HorizontalAxis.Value;
+                currVerticalAngle = orbitalFollow.VerticalAxis.Value;
+                currZoomDistance = orbitalFollow.Radius;
+                
+                if(currHorizontalAngle > horizontalMaxLimit || currHorizontalAngle < horizontalMinLimit)
+                {
+                    Debug.LogWarning($"Initial Horizontal Angle {currHorizontalAngle} is out of bounds [{horizontalMinLimit}, {horizontalMaxLimit}]");
+                }
+                if(currVerticalAngle > verticalMaxLimit || currVerticalAngle < verticalMinLimit)
+                {
+                    Debug.LogWarning($"Initial Vertical Angle {currVerticalAngle} is out of bounds [{verticalMinLimit}, {verticalMaxLimit}]");
+                }
+                if(currZoomDistance > zoomMaxLimit || currZoomDistance < zoomMinLimit)
+                {
+                    Debug.LogWarning($"Initial Zoom Distance {currZoomDistance} is out of bounds [{zoomMinLimit}, {zoomMaxLimit}]");
+                }
             }
         }
 
         private void OnEnable()
         {
-            #if UNITY_EDITOR
-            if(ValidateScreenDimensionsCoroutine != null)
-                StopCoroutine(ValidateScreenDimensionsCoroutine);
-            
+#if UNITY_EDITOR
+            if(ValidateScreenDimensionsCoroutine != null) { StopCoroutine(ValidateScreenDimensionsCoroutine); }
             ValidateScreenDimensionsCoroutine = StartCoroutine(CalculateScreenDimentions());
-            #else
+#else
             UpdateScreenDimentions();
-            #endif
+#endif
         }
+
+        private void Update()
+        {
+            // TODO: Replace with input system
+            if (Input.mouseScrollDelta.y != 0) // mouse scrolled
+            {
+                HandleChangeCameraZoom();
+            }
+            
+            // TODO: Replace with input system
+            if (Input.GetMouseButtonDown(1)) // Right Click
+            {
+                Cursor.lockState  = CursorLockMode.Locked;
+                Cursor.visible = false;
+            }
+            if (Input.GetMouseButton(1)) // Right Click
+            {
+                HandleChangeCameraAngles();
+            }
+            if (Input.GetMouseButtonUp(1)) // Right Click
+            {
+                Cursor.lockState  = CursorLockMode.None;
+                Cursor.visible = true;
+            }
+        }
+
+        private void OnDisable()
+        {
+#if UNITY_EDITOR
+            if (ValidateScreenDimensionsCoroutine != null) { StopCoroutine(ValidateScreenDimensionsCoroutine); }
+#endif
+        }
+        
+        #endregion MonoBehaviourMethods
 
         private void UpdateScreenDimentions()
         {
@@ -59,39 +116,31 @@ namespace TGL.RPG.Navigation.PTM
             halfScreenHeight = Screen.height / 2.0f;
         }
 
-        private void Update()
+        private void HandleChangeCameraAngles()
         {
-            // TODO: Replace with input system
-            mousePos = Input.mousePosition;
-            camPosComposer.TargetOffset = currOffset; // set to calculated offset
+            // Get new values
+            currVerticalAngle -= Input.mousePositionDelta.y; // TODO: Replace with input system
+            currHorizontalAngle += Input.mousePositionDelta.x; // TODO: Replace with input system
             
-            // TODO: Replace with input system
-            if (Input.GetMouseButton(1)) // Right Click
+            if (horizontalNoLimit)
             {
-                // out of bounds check
-                if(mousePos.x < 0 || mousePos.x > Screen.width || 
-                   mousePos.y < 0 || mousePos.y > Screen.height)
-                {
-                    return; 
-                }
-
-                if (useScreenEdgeLook)
-                {
-                    // if we want to limit the offset by a factor of screen dimensions
-                    currOffset = mousePos / GameConstants.PlayerCameraConstants.mouseCamOffsetFactor; // MouseCamOffsetFactor - calculate new offset based on mouse position
-                }
-                else
-                {   
-                    // bottom left of screen is (0,0), top right is (Screen.width, Screen.height)
-                    mousePos.x -= halfScreenWidth; // Centering X
-                    mousePos.y -= halfScreenHeight; // Centering Y
-                    
-                    // if we want to limit the offset by max offset values
-                    currOffset = new Vector3((mousePos.x/halfScreenWidth) * GameConstants.PlayerCameraConstants.maxTargetOffsetX, currOffset.y, (mousePos.y / halfScreenHeight) * GameConstants.PlayerCameraConstants.maxTargetOffsetY);
-                }
-
-                Debug.Log($"For mouse pos: {mousePos} in screen ({Screen.width}, {Screen.height}), new offset is: {currOffset}");
+                if(currHorizontalAngle < -180f) { currHorizontalAngle += 360f; }
+                if(currHorizontalAngle > 180f) { currHorizontalAngle -= 360f; }
             }
+            else
+            {
+                currHorizontalAngle = Mathf.Clamp(currHorizontalAngle, horizontalMinLimit, horizontalMaxLimit);
+            }
+            
+            currVerticalAngle = Mathf.Clamp(currVerticalAngle, verticalMinLimit, verticalMaxLimit);
+            orbitalFollow.HorizontalAxis.Value = currHorizontalAngle;
+            orbitalFollow.VerticalAxis.Value = currVerticalAngle;
+        }
+
+        private void HandleChangeCameraZoom()
+        {
+            currZoomDistance -= Input.mouseScrollDelta.y * zoomSensitivity; // TODO: Replace with input system
+            orbitalFollow.Radius = Mathf.Clamp(currZoomDistance, zoomMinLimit, zoomMaxLimit);
         }
 
         private IEnumerator CalculateScreenDimentions()
@@ -102,15 +151,6 @@ namespace TGL.RPG.Navigation.PTM
                 yield return new WaitForSeconds(10); // in case user decides to change screen resolution while in editor
                 //TODO: Add event listener for resolution change instead of polling
             }            
-        }
-
-        private void OnDisable()
-        {
-            
-#if UNITY_EDITOR
-            if(ValidateScreenDimensionsCoroutine != null)
-                StopCoroutine(ValidateScreenDimensionsCoroutine);
-#endif
         }
     }
 }
