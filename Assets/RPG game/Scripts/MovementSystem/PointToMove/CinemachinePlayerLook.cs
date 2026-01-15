@@ -1,5 +1,8 @@
 using System;
 using System.Collections;
+using RPG_Game.Scripts.ChangeCursors;
+using RPG_Game.Scripts.CommunicationBus.Sample;
+using TGL.RPG.CommunicationBus;
 using TGL.RPG.Constants.Sample;
 using Unity.Cinemachine;
 using UnityEngine;
@@ -10,15 +13,17 @@ namespace TGL.RPG.Navigation.PTM
     {
         [SerializeField] private CinemachineCamera playerCamera;
         // Horizontal angle limits,
-        [Header("Horizontal"), SerializeField, Range(-179.9f, 179.99f)] private float horizontalMinLimit;
-        [SerializeField, Range(-179.9f, 179.99f)] private float horizontalMaxLimit;
-        [SerializeField] private bool horizontalNoLimit;
+        [Header("Horizontal"), SerializeField] private bool horizontalNoLimit = true;
+        [SerializeField, Range(-179.99f, 179.99f)] private float horizontalMinLimit, horizontalMaxLimit;
         
         // Vertical angle limits
-        [Header("Vertical"), SerializeField, Range(-10f, 45f)] private float verticalMinLimit, verticalMaxLimit;
+        [Header("Vertical"), SerializeField, Range(-10f, 45f)] private float verticalMinLimit = -2f;
+        [SerializeField, Range(-10f, 45f)] private float verticalMaxLimit = 35f;
+        
         // Zoom distance limits
-        [Header("Zoom"), SerializeField, Range(2f, 15f)] private float zoomMinLimit, zoomMaxLimit;
-        [Header("Zoom"), SerializeField, Range(0.1f, 1.5f)] private float zoomSensitivity = 1f;
+        [Header("Zoom"), SerializeField, Range(0.1f, 1.5f)] private float zoomSensitivity = 0.35f;
+        [SerializeField, Range(2f, 15f)] private float zoomMinLimit = 2;
+        [SerializeField, Range(2f, 15f)] private float zoomMaxLimit = 15;
         
         private CinemachineOrbitalFollow orbitalFollow;
         private float currHorizontalAngle, currVerticalAngle, currZoomDistance;
@@ -87,8 +92,8 @@ namespace TGL.RPG.Navigation.PTM
             // TODO: Replace with input system
             if (Input.GetMouseButtonDown(1)) // Right Click
             {
-                Cursor.lockState  = CursorLockMode.Locked;
-                Cursor.visible = false;
+                // TODO: Find a way to decouple Cursor from this class
+                MessageBus.PublishMessage(MessageTypes.ChangeCursor, new ChangeCursorEvent(CursorTypes.MoveCamera));
             }
             if (Input.GetMouseButton(1)) // Right Click
             {
@@ -96,8 +101,8 @@ namespace TGL.RPG.Navigation.PTM
             }
             if (Input.GetMouseButtonUp(1)) // Right Click
             {
-                Cursor.lockState  = CursorLockMode.None;
-                Cursor.visible = true;
+                // TODO: Find a way to decouple Cursor from this class
+                MessageBus.PublishMessage(MessageTypes.ChangeCursor, new ChangeCursorEvent(CursorTypes.Basic));
             }
         }
 

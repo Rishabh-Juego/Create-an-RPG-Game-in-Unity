@@ -25,6 +25,11 @@ Assets used in the project:
     - [Alchemy Lab Props](https://assetstore.unity.com/packages/3d/props/furniture/alchemy-lab-props-41758) - [M. na Station](https://assetstore.unity.com/publishers/12379)
     - [Lowpoly Dinner Table](https://assetstore.unity.com/packages/3d/environments/fantasy/lowpoly-dinner-table-55180) - [Evgenia](https://assetstore.unity.com/publishers/9175)
     - we are downloading all assets from the Udemy course asset links.
+    - [Basic RPG Cursors](https://assetstore.unity.com/packages/2d/textures-materials/basic-rpg-cursors-139404) - [Poneti free](https://assetstore.unity.com/publishers/41110)
+- Free Sources
+  - Fonts:
+    - [kelt caps freehand font](https://www.1001fonts.com/kelt-caps-freehand-font.html)
+    - 
 
 ##### Packages
 Packages:
@@ -57,8 +62,21 @@ Using the Cinemachine package for camera system.
 - `CinemachineCamera` is the main cinemachine camera in the scene.
   - The Transform rotation determines the directon from which the camera follows the player.
   - We are using TrackingTarget component to follow the player.
-  - We are using `CinemachinePositionComposer` (PositionControl: PositionComposer) to define the new camera position.
-    - This adds a `CinemachinePositionComposer` component to the Cinemachine camera.
-    - This does not impact the rotation of the camera, only the position, so we can use a script to control camera rotation while keeping position at a specified 'distance' from the player.
-- `CinemachinePlayerLook` is used for controlling the cinemachine camera's `CinemachinePositionComposer` component.
+  - We are using `CinemachineOrbitalFollow` (PositionControl: Orbital Follow) to define the new camera position.
+    - This adds a `CinemachineOrbitalFollow` component to the Cinemachine camera.
+    - As this has only rotation, we want camera to always look at the player, so we set the `RotationControl` in `CinemachineCamera` to `Hard Look At`.
+- `CinemachinePlayerLook` is used for controlling the cinemachine camera's `CinemachineOrbitalFollow` component (horizontal position angle, vertical position angle, distance radius).
+
+
+#### Cursors
+We can use different cursors for different actions.
+- `CursorHandler.cs` is used to manage different cursors.
+- We are using `CursorType` enum to define different cursor types.
+- We are using `CursorMapping` struct to map cursor type to texture.
+
+#### Communication Bus
+We do not want to tightly couple different systems together.
+- `MessageBus.cs` is used to send messages between different systems without them knowing about each other.
+- Each message is defined as a class that inherits from `IMessageBody` base class.
+- `MessageBus` has methods to subscribe, unsubscribe and publish messages which are segregated by `MessageTypes.cs` enum.
 
