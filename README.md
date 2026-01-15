@@ -28,8 +28,9 @@ Assets used in the project:
 
 ##### Packages
 Packages:
-- `com.unity.postprocessing`
+- `com.unity.postprocessing` - 3.5.1
 - Pro Builder - removed when we downloaded complete asset from udemy course.
+- `com.unity.cinemachine` - 3.1.5
 - 
 
 #### Changes based on Platform
@@ -39,6 +40,11 @@ What changes are needed based on platform:
 
 
 ### Systems
+#### Constants
+- All constant values are stored in `GameConstants.cs` file.
+- We made multiple partial classes for `GameConstants.cs` file to organize constants based on their usage.
+  - see `GameConstants.PlayerAnimConstants` class for understanding.
+
 #### Player Movement
 Using the namespace `TGL.RPG.Navigation.PTM`(Point To Move) for player movement.
 - Player movement is done using Navmesh and raycasting.
@@ -46,8 +52,7 @@ Using the namespace `TGL.RPG.Navigation.PTM`(Point To Move) for player movement.
 - `PlayerAnimationController.cs` is used to control the player animations based on movement.
 - `AutoBraking` is turned off, so character does not slow down when approaching the target point.
 
-#### Constants
-- All constant values are stored in `GameConstants.cs` file.
-- We made multiple partial classes for `GameConstants.cs` file to organize constants based on their usage.
-  - see `GameConstants.PlayerAnimConstants` class for understanding.
+#### Camera System
+Using the Cinemachine package for camera system.
+- `CinemachinePlayerLook` is used for controlling the cinemachine camera.
 
