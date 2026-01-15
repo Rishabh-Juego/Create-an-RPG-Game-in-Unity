@@ -54,5 +54,11 @@ Using the namespace `TGL.RPG.Navigation.PTM`(Point To Move) for player movement.
 
 #### Camera System
 Using the Cinemachine package for camera system.
-- `CinemachinePlayerLook` is used for controlling the cinemachine camera.
+- `CinemachineCamera` is the main cinemachine camera in the scene.
+  - The Transform rotation determines the directon from which the camera follows the player.
+  - We are using TrackingTarget component to follow the player.
+  - We are using `CinemachinePositionComposer` (PositionControl: PositionComposer) to define the new camera position.
+    - This adds a `CinemachinePositionComposer` component to the Cinemachine camera.
+    - This does not impact the rotation of the camera, only the position, so we can use a script to control camera rotation while keeping position at a specified 'distance' from the player.
+- `CinemachinePlayerLook` is used for controlling the cinemachine camera's `CinemachinePositionComposer` component.
 

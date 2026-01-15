@@ -2,5 +2,5 @@ using UnityEngine;
 
 namespace TGL.RPG.Constants.Sample
 {
-    public partial class GameConstants {}
+    public static partial class GameConstants {}
 }

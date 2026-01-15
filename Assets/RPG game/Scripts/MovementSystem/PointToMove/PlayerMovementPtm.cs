@@ -3,6 +3,7 @@ using UnityEngine.AI;
 
 namespace TGL.RPG.Navigation.PTM
 {
+    [RequireComponent(typeof(NavMeshAgent))]
     public class PlayerMovementPtm : MonoBehaviour
     {
         [SerializeField] private Camera cam;
@@ -18,6 +19,7 @@ namespace TGL.RPG.Navigation.PTM
         
         void Update()
         {
+            // TODO: Replace with input system
             if (Input.GetMouseButtonDown(0)) // on left mouse button click
             {
                 ray = cam.ScreenPointToRay(Input.mousePosition); // create a ray from the camera to the mouse position
