@@ -1,7 +1,7 @@
 using System;
 using UnityEngine;
 
-namespace RPG_Game.Scripts.ChangeCursors
+namespace TGL.RPG.GameCursor
 {
     [Serializable]
     public struct CursorMapping

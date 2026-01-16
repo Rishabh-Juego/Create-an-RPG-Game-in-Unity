@@ -1,4 +1,4 @@
-namespace RPG_Game.Scripts.ChangeCursors
+namespace TGL.RPG.GameCursor
 {
     public enum CursorTypes
     {

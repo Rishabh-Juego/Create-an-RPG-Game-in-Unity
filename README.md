@@ -66,7 +66,11 @@ Using the Cinemachine package for camera system.
     - This adds a `CinemachineOrbitalFollow` component to the Cinemachine camera.
     - As this has only rotation, we want camera to always look at the player, so we set the `RotationControl` in `CinemachineCamera` to `Hard Look At`.
 - `CinemachinePlayerLook` is used for controlling the cinemachine camera's `CinemachineOrbitalFollow` component (horizontal position angle, vertical position angle, distance radius).
+- As players can change and references set through inspector can be lost, we are setting the `CinemachineCamera` and `Camera` references through `CameraRegistry.cs` registry.  
 
+> Cinemachine Target needs to be set after player is instantiated, Currently we are not setting this.
+> When a player changes, "PlayerCharacter" -> "Player model parent" -> "TargetPos" => we can add our prefab as child to "Player model parent" at local position (0,0,0).
+> We then set the `CinemachineCamera`'s Target to this instantiated object.
 
 #### Cursors
 We can use different cursors for different actions.
@@ -79,4 +83,9 @@ We do not want to tightly couple different systems together.
 - `MessageBus.cs` is used to send messages between different systems without them knowing about each other.
 - Each message is defined as a class that inherits from `IMessageBody` base class.
 - `MessageBus` has methods to subscribe, unsubscribe and publish messages which are segregated by `MessageTypes.cs` enum.
+
+#### Player
+Each player has a camera reference for raycasting as well as reference to Cinemachine camera for position, rotation and zoom.  
+To avoid loading errors, each player prefab we made has a camera and cinemachine camera as child objects.
+Male and Female characters have separate animation controllers, so any change in controller, translations, etc. needs to be repeated for both.
 

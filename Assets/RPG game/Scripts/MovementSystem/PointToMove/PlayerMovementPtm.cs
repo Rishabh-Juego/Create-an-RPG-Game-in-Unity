@@ -1,3 +1,4 @@
+using TGL.RPG.CameraManagement;
 using UnityEngine;
 using UnityEngine.AI;
 
@@ -6,7 +7,7 @@ namespace TGL.RPG.Navigation.PTM
     [RequireComponent(typeof(NavMeshAgent))]
     public class PlayerMovementPtm : MonoBehaviour
     {
-        [SerializeField] private Camera cam;
+        private Camera cam; // reference to the Game camera, using registry to get the active camera
         private NavMeshAgent _agent; // agent which will move using the current script
         private Ray ray;
         private RaycastHit hit;
@@ -14,7 +15,16 @@ namespace TGL.RPG.Navigation.PTM
         void Start()
         {
             _agent = GetComponent<NavMeshAgent>();
-            if(cam == null) cam = Camera.main;
+            UpdateSceneReferences();
+        }
+
+        public void UpdateSceneReferences()
+        {
+            cam = CameraRegistry.Get()?.ActiveCamera;
+            if (cam == null)
+            {
+                Debug.LogError("No active camera found in the scene. Please ensure there is a camera with a GameCamera component.");
+            }
         }
         
         void Update()

@@ -1,9 +1,10 @@
 using System;
 using System.Collections;
-using RPG_Game.Scripts.ChangeCursors;
 using RPG_Game.Scripts.CommunicationBus.Sample;
+using TGL.RPG.CameraManagement;
 using TGL.RPG.CommunicationBus;
 using TGL.RPG.Constants.Sample;
+using TGL.RPG.GameCursor;
 using Unity.Cinemachine;
 using UnityEngine;
 
@@ -11,7 +12,7 @@ namespace TGL.RPG.Navigation.PTM
 {
     public class CinemachinePlayerLook : MonoBehaviour
     {
-        [SerializeField] private CinemachineCamera playerCamera;
+        private CinemachineCamera playerCamera;
         // Horizontal angle limits,
         [Header("Horizontal"), SerializeField] private bool horizontalNoLimit = true;
         [SerializeField, Range(-179.99f, 179.99f)] private float horizontalMinLimit, horizontalMaxLimit;
@@ -35,42 +36,10 @@ namespace TGL.RPG.Navigation.PTM
 
         #region MonoBehaviourMethods
 
-        private void Awake()
+        private void Start()
         {
-            if (playerCamera == null)
-            {
-                Debug.LogError($"No camera assigned in {nameof(CinemachinePlayerLook)} on {gameObject.name}", this);
-                return;
-            }
-            
-            // get the  'CinemachineOrbitalFollow' from the 'Body' stage of the Cinemachine Camera
-            orbitalFollow = playerCamera.GetCinemachineComponent(CinemachineCore.Stage.Body) as CinemachineOrbitalFollow;
-
-            if (orbitalFollow == null)
-            {
-                Debug.LogError($"No 'CinemachineOrbitalFollow' found in {playerCamera.name}, are we still using 'PositionControl: Orbital Follow' in the inspector?", playerCamera);
-            }
-            else
-            {
-                currHorizontalAngle = orbitalFollow.HorizontalAxis.Value;
-                currVerticalAngle = orbitalFollow.VerticalAxis.Value;
-                currZoomDistance = orbitalFollow.Radius;
-                
-                if(currHorizontalAngle > horizontalMaxLimit || currHorizontalAngle < horizontalMinLimit)
-                {
-                    Debug.LogWarning($"Initial Horizontal Angle {currHorizontalAngle} is out of bounds [{horizontalMinLimit}, {horizontalMaxLimit}]");
-                }
-                if(currVerticalAngle > verticalMaxLimit || currVerticalAngle < verticalMinLimit)
-                {
-                    Debug.LogWarning($"Initial Vertical Angle {currVerticalAngle} is out of bounds [{verticalMinLimit}, {verticalMaxLimit}]");
-                }
-                if(currZoomDistance > zoomMaxLimit || currZoomDistance < zoomMinLimit)
-                {
-                    Debug.LogWarning($"Initial Zoom Distance {currZoomDistance} is out of bounds [{zoomMinLimit}, {zoomMaxLimit}]");
-                }
-            }
+            UpdateSceneReferences();
         }
-
         private void OnEnable()
         {
 #if UNITY_EDITOR
@@ -115,6 +84,44 @@ namespace TGL.RPG.Navigation.PTM
         
         #endregion MonoBehaviourMethods
 
+        public void UpdateSceneReferences()
+        {
+            playerCamera = CameraRegistry.Get()?.CameraSettings;
+            if (playerCamera == null)
+            {
+                Debug.LogError($"No camera assigned in {nameof(CinemachinePlayerLook)} on {gameObject.name}", this);
+                return;
+            }
+            
+            // get the  'CinemachineOrbitalFollow' from the 'Body' stage of the Cinemachine Camera
+            orbitalFollow = playerCamera.GetCinemachineComponent(CinemachineCore.Stage.Body) as CinemachineOrbitalFollow;
+
+            if (orbitalFollow == null)
+            {
+                Debug.LogError($"No 'CinemachineOrbitalFollow' found in {playerCamera.name}, are we still using 'PositionControl: Orbital Follow' in the inspector?", playerCamera);
+            }
+            else
+            {
+                currHorizontalAngle = orbitalFollow.HorizontalAxis.Value;
+                currVerticalAngle = orbitalFollow.VerticalAxis.Value;
+                currZoomDistance = orbitalFollow.Radius;
+                
+                if(currHorizontalAngle > horizontalMaxLimit || currHorizontalAngle < horizontalMinLimit)
+                {
+                    Debug.LogWarning($"Initial Horizontal Angle {currHorizontalAngle} is out of bounds [{horizontalMinLimit}, {horizontalMaxLimit}]");
+                }
+                if(currVerticalAngle > verticalMaxLimit || currVerticalAngle < verticalMinLimit)
+                {
+                    Debug.LogWarning($"Initial Vertical Angle {currVerticalAngle} is out of bounds [{verticalMinLimit}, {verticalMaxLimit}]");
+                }
+                if(currZoomDistance > zoomMaxLimit || currZoomDistance < zoomMinLimit)
+                {
+                    Debug.LogWarning($"Initial Zoom Distance {currZoomDistance} is out of bounds [{zoomMinLimit}, {zoomMaxLimit}]");
+                }
+            }
+            
+        }
+        
         private void UpdateScreenDimentions()
         {
             halfScreenWidth = Screen.width / 2.0f;

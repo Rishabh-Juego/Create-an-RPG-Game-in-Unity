@@ -1,5 +1,5 @@
-using RPG_Game.Scripts.ChangeCursors;
 using TGL.RPG.CommunicationBus;
+using TGL.RPG.GameCursor;
 
 namespace RPG_Game.Scripts.CommunicationBus.Sample
 {

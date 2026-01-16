@@ -1,90 +1,95 @@
 
 using System;
 using System.Collections.Generic;
-using RPG_Game.Scripts.ChangeCursors;
 using RPG_Game.Scripts.CommunicationBus.Sample;
 using TGL.RPG.CommunicationBus;
 using UnityEngine;
 using UnityEngine.UI;
 
-[RequireComponent(typeof(Image))]
-public class CursorHandler : MonoBehaviour
+namespace TGL.RPG.GameCursor
 {
-    [Header("References")] 
-    [SerializeField] private List<CursorMapping> cursorMappings;
-    
-    private Image cursorImage;
-    private GameObject cursorObj;
-    
-    private void Awake()
+    [RequireComponent(typeof(Image))]
+    public class CursorHandler : MonoBehaviour
     {
-        if (ValidateSerializedFields())
+        [Header("References")] [SerializeField]
+        private List<CursorMapping> cursorMappings;
+
+        private Image cursorImage;
+        private GameObject cursorObj;
+
+        private void Awake()
         {
-            RegisterMessageBusEvents();
-            DisableUserCursor();
+            if (ValidateSerializedFields())
+            {
+                RegisterMessageBusEvents();
+                DisableUserCursor();
+            }
+            else
+            {
+                Debug.LogError($"Serialized fields not valid on {gameObject.name}", this);
+            }
         }
-        else
+
+        private void Update()
         {
-            Debug.LogError($"Serialized fields not valid on {gameObject.name}", this);
+            // TODO: Replace with input system
+            cursorObj.transform.position = Input.mousePosition;
         }
-    }
 
-    private void Update()
-    {
-        // TODO: Replace with input system
-        cursorObj.transform.position = Input.mousePosition; 
-    }
-
-    private void OnDestroy()
-    {
-        UnregisterMessageBusEvents();
-    }
-    
-    private void RegisterMessageBusEvents()
-    {
-        MessageBus.RegisterMessageListener(MessageTypes.ShowCursor, ShowCursor);
-        MessageBus.RegisterMessageListener(MessageTypes.ChangeCursor, ChangeCursorType);
-    }
-    private void UnregisterMessageBusEvents()
-    {
-        MessageBus.UnregisterMessageListener(MessageTypes.ShowCursor, ShowCursor);
-        MessageBus.UnregisterMessageListener(MessageTypes.ChangeCursor, ChangeCursorType);
-    }
-
-    private bool ValidateSerializedFields()
-    {
-        cursorImage = GetComponent<Image>();
-        if (cursorImage == null)
+        private void OnDestroy()
         {
-            Debug.LogWarning($"could not find Image component on {gameObject.name}", this);
-            return false;
+            UnregisterMessageBusEvents();
         }
-        cursorObj = cursorImage.gameObject;
-        return true;
-    }
-    
-    private void DisableUserCursor()
-    {
-        Cursor.lockState = CursorLockMode.Confined;
-        Cursor.visible = false;
-    }
 
-    private void ShowCursor(IMessageBody msgBody)
-    {
-        if(msgBody is not ShowCursorEvent showCursorEvent) return;
-        cursorImage.enabled = showCursorEvent.canShow;
-    }
-
-    private void ChangeCursorType(IMessageBody msgBody)
-    {
-        if(msgBody is not ChangeCursorEvent changeCursorEvent) return;
-        
-        CursorMapping mappedCursor = cursorMappings.Find(mapping => mapping.cursorType == changeCursorEvent.setCursorType);
-        if (mappedCursor.cursorSprite == null)
+        private void RegisterMessageBusEvents()
         {
-            throw new ArgumentOutOfRangeException(nameof(changeCursorEvent.setCursorType), 
-                changeCursorEvent.setCursorType, $"No entry for cursor type {changeCursorEvent.setCursorType} found");
+            MessageBus.RegisterMessageListener(MessageTypes.ShowCursor, ShowCursor);
+            MessageBus.RegisterMessageListener(MessageTypes.ChangeCursor, ChangeCursorType);
         }
-        cursorImage.sprite = mappedCursor.cursorSprite;
+
+        private void UnregisterMessageBusEvents()
+        {
+            MessageBus.UnregisterMessageListener(MessageTypes.ShowCursor, ShowCursor);
+            MessageBus.UnregisterMessageListener(MessageTypes.ChangeCursor, ChangeCursorType);
+        }
+
+        private bool ValidateSerializedFields()
+        {
+            cursorImage = GetComponent<Image>();
+            if (cursorImage == null)
+            {
+                Debug.LogWarning($"could not find Image component on {gameObject.name}", this);
+                return false;
+            }
+
+            cursorObj = cursorImage.gameObject;
+            return true;
+        }
+
+        private void DisableUserCursor()
+        {
+            Cursor.lockState = CursorLockMode.Confined;
+            Cursor.visible = false;
+        }
+
+        private void ShowCursor(IMessageBody msgBody)
+        {
+            if (msgBody is not ShowCursorEvent showCursorEvent) return;
+            cursorImage.enabled = showCursorEvent.canShow;
+        }
+
+        private void ChangeCursorType(IMessageBody msgBody)
+        {
+            if (msgBody is not ChangeCursorEvent changeCursorEvent) return;
+
+            CursorMapping mappedCursor = cursorMappings.Find(mapping => mapping.cursorType == changeCursorEvent.setCursorType);
+            if (mappedCursor.cursorSprite == null)
+            {
+                throw new ArgumentOutOfRangeException(nameof(changeCursorEvent.setCursorType),
+                    changeCursorEvent.setCursorType, $"No entry for cursor type {changeCursorEvent.setCursorType} found");
+            }
+
+            cursorImage.sprite = mappedCursor.cursorSprite;
+        }
     }
 }
