@@ -1,7 +1,11 @@
 using System;
 using System.Collections.Generic;
+using App.SceneManagement;
+using RPG_Game.Scripts.CommunicationBus.Sample;
+using TGL.RPG.CommunicationBus;
 using TGL.RPG.Constants.Sample;
 using TGL.RPG.Data.Character;
+using TGL.ServiceLocator;
 using TMPro;
 using UnityEngine;
 using CharacterInfo = TGL.RPG.Data.Character.CharacterInfo;
@@ -57,12 +61,21 @@ namespace TGL.RPG.Character
         
         public void ConfirmSelection()
         {
-            playerName = nameInputField.text;
             // currentCharacterIndex // char index
-            // allAvailableCharacters[currentCharacterIndex].characterID; // char Id
+            // allAvailableCharacters[currentCharacterIndex].characterID; // char ID
             // allAvailableCharacters[currentCharacterIndex].characterName; // char name
             
-            throw new NotImplementedException();
+            playerName = nameInputField.text; // In case user has changed the name
+            
+            // if we have an old registration, unregister it first
+            if (SLocator.GetSlGlobal.HasService<ISelectedCharacter>())
+            {
+                SLocator.GetSlGlobal.UnRegister(typeof(ISelectedCharacter));
+            }
+            
+            // TODO: Service Locator registration is tightly coupled here for simplicity. In a production scenario, consider using a more decoupled approach.
+            SLocator.GetSlGlobal.Register(typeof(ISelectedCharacter), new SelectedCharacterInfoData(allAvailableCharacters[currentCharacterIndex], playerName)); // save the choice made
+            MessageBus.PublishMessage(MessageTypes.ChangeScene, new ChangeSceneEvent(AppSceneTypes.MainGameScene)); // change scene
         }
         #endregion ButtonMethods
 

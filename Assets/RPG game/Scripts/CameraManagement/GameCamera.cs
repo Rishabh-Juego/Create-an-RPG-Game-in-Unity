@@ -1,5 +1,6 @@
 using Unity.Cinemachine;
 using UnityEngine;
+using TGL.ServiceLocator;
 
 namespace TGL.RPG.CameraManagement
 {
@@ -15,7 +16,7 @@ namespace TGL.RPG.CameraManagement
         {
             if (gameCamera != null && camSettings != null)
             {
-                CameraRegistry.Register(this);
+                SLocator.GetSlGlobal.Register(typeof(IActiveCameraProvider), this);
             }
             else
             {
@@ -25,7 +26,8 @@ namespace TGL.RPG.CameraManagement
 
         private void OnDestroy() 
         {
-            CameraRegistry.Unregister(this);
+            
+            SLocator.GetSlGlobal.UnRegister(typeof(IActiveCameraProvider));
         }
     }
 }

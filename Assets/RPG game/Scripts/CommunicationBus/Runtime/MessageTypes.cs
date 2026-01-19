@@ -5,6 +5,7 @@ namespace TGL.RPG.CommunicationBus
         NONE = 0,
         ChangeCursor = 1,
         ShowCursor = 2,
+        ChangeScene = 3,
         
     }
 }

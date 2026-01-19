@@ -5,6 +5,7 @@ using TGL.RPG.CameraManagement;
 using TGL.RPG.CommunicationBus;
 using TGL.RPG.Constants.Sample;
 using TGL.RPG.GameCursor;
+using TGL.ServiceLocator;
 using Unity.Cinemachine;
 using UnityEngine;
 
@@ -86,7 +87,12 @@ namespace TGL.RPG.Navigation.PTM
 
         public void UpdateSceneReferences()
         {
-            playerCamera = CameraRegistry.Get()?.CameraSettings;
+            if (!SLocator.GetSlGlobal.TryGet(out IActiveCameraProvider cameraProvider))
+            {
+                Debug.LogWarning($"Have not been able to get an active camera provider for {nameof(CinemachinePlayerLook)} on {gameObject.name}", this);
+                return;
+            }
+            playerCamera = cameraProvider.CameraSettings;
             if (playerCamera == null)
             {
                 Debug.LogError($"No camera assigned in {nameof(CinemachinePlayerLook)} on {gameObject.name}", this);

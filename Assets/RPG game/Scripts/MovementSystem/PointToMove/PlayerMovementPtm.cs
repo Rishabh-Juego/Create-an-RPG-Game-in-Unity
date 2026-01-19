@@ -1,4 +1,5 @@
 using TGL.RPG.CameraManagement;
+using TGL.ServiceLocator;
 using UnityEngine;
 using UnityEngine.AI;
 
@@ -20,7 +21,12 @@ namespace TGL.RPG.Navigation.PTM
 
         public void UpdateSceneReferences()
         {
-            cam = CameraRegistry.Get()?.ActiveCamera;
+            if (!SLocator.GetSlGlobal.TryGet(out IActiveCameraProvider activeCameraProvider))
+            {
+                Debug.LogWarning($"Could not find IActiveCameraProvider in the scene for {gameObject.name}");
+                return;
+            }
+            cam = activeCameraProvider.ActiveCamera;
             if (cam == null)
             {
                 Debug.LogError("No active camera found in the scene. Please ensure there is a camera with a GameCamera component.");

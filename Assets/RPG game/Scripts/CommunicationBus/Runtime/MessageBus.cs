@@ -4,7 +4,7 @@ using UnityEngine;
 
 namespace TGL.RPG.CommunicationBus
 {
-    public class MessageBus
+    public static class MessageBus
     {
         private static Dictionary<MessageTypes, List<Action<IMessageBody>>> messageSubscribers = new Dictionary<MessageTypes, List<Action<IMessageBody>>>();
         private static Action<MessageTypes, IMessageBody> OnPublishMessage;
