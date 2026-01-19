@@ -1,0 +1,17 @@
+using UnityEngine;
+using CharacterInfo = TGL.RPG.Data.Character.CharacterInfo;
+
+namespace TGL.RPG.Character
+{
+    public class SelectedCharacterInfoData : ISelectedCharacter
+    {
+        public SelectedCharacterInfoData(CharacterInfo selectedCharacter, string selectedCharacterName)
+        {
+            SelectedCharacter = selectedCharacter;
+            SelectedCharacterName = selectedCharacterName;
+        }
+        
+        public CharacterInfo SelectedCharacter { get; }
+        public string SelectedCharacterName { get; }
+    }
+}

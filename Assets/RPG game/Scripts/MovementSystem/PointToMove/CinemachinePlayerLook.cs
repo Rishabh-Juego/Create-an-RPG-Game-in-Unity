@@ -1,8 +1,8 @@
 using System;
 using System.Collections;
-using RPG_Game.Scripts.CommunicationBus.Sample;
 using TGL.RPG.CameraManagement;
 using TGL.RPG.CommunicationBus;
+using TGL.RPG.CommunicationBus.Sample;
 using TGL.RPG.Constants.Sample;
 using TGL.RPG.GameCursor;
 using TGL.ServiceLocator;

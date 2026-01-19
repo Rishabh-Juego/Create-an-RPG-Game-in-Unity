@@ -89,3 +89,9 @@ Each player has a camera reference for raycasting as well as reference to Cinema
 To avoid loading errors, each player prefab we made has a camera and cinemachine camera as child objects.
 Male and Female characters have separate animation controllers, so any change in controller, translations, etc. needs to be repeated for both.
 
+#### service locator
+We are unable to use the public service locator package due to some errors.  
+I am using the clone of the service locator from the [github](https://github.com/tglGames-Plugins/tgl-service-locator) project.  
+We use service locator to register and retrieve services in the game.
+- `SelectedCharacterInfoData.cs` is used to save the selected character information data. which is held in the service locator.
+- `GameCamera.cs`(`IActiveCameraProvider.cs`) is used to save the active camera provider. which is held in the service locator.

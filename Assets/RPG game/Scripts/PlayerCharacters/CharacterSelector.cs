@@ -1,8 +1,8 @@
 using System;
 using System.Collections.Generic;
 using App.SceneManagement;
-using RPG_Game.Scripts.CommunicationBus.Sample;
 using TGL.RPG.CommunicationBus;
+using TGL.RPG.CommunicationBus.Sample;
 using TGL.RPG.Constants.Sample;
 using TGL.RPG.Data.Character;
 using TGL.ServiceLocator;
@@ -75,7 +75,7 @@ namespace TGL.RPG.Character
             
             // TODO: Service Locator registration is tightly coupled here for simplicity. In a production scenario, consider using a more decoupled approach.
             SLocator.GetSlGlobal.Register(typeof(ISelectedCharacter), new SelectedCharacterInfoData(allAvailableCharacters[currentCharacterIndex], playerName)); // save the choice made
-            MessageBus.PublishMessage(MessageTypes.ChangeScene, new ChangeSceneEvent(AppSceneTypes.MainGameScene)); // change scene
+            MessageBus.PublishMessage(MessageTypes.ActivateSingleScene, new ChangeSceneEvent(AppSceneTypes.MainGameScene)); // change scene
         }
         #endregion ButtonMethods
 

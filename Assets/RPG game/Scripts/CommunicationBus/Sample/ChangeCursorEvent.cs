@@ -1,7 +1,7 @@
 using TGL.RPG.CommunicationBus;
 using TGL.RPG.GameCursor;
 
-namespace RPG_Game.Scripts.CommunicationBus.Sample
+namespace TGL.RPG.CommunicationBus.Sample
 {
     public class ChangeCursorEvent : IMessageBody
     {

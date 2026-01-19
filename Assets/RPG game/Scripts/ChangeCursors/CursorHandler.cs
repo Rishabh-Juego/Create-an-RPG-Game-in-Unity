@@ -1,8 +1,7 @@
-
 using System;
 using System.Collections.Generic;
-using RPG_Game.Scripts.CommunicationBus.Sample;
 using TGL.RPG.CommunicationBus;
+using TGL.RPG.CommunicationBus.Sample;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -74,6 +73,7 @@ namespace TGL.RPG.GameCursor
 
         private void ShowCursor(IMessageBody msgBody)
         {
+            // TODO: When user is on different screen, consider hiding the custom cursor and showing system cursor as needed
             if (msgBody is not ShowCursorEvent showCursorEvent) return;
             cursorImage.enabled = showCursorEvent.canShow;
         }

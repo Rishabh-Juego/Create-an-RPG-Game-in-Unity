@@ -1,10 +1,10 @@
 using TGL.RPG.CommunicationBus;
 
-namespace RPG_Game.Scripts.CommunicationBus.Sample
+namespace TGL.RPG.CommunicationBus.Sample
 {
     public class ShowCursorEvent : IMessageBody
     {
-        public bool canShow;
+        public readonly bool canShow;
 
         public ShowCursorEvent(bool showCursor)
         {
