@@ -1,0 +1,19 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: bd4897ed96f134b4683f8a1f3e4b43d2, type: 3}
+  m_Name: Female01
+  m_EditorClassIdentifier: 
+  characterID: 1
+  characterName: Sarah
+  modelPrefab: {fileID: 5016298688100339028, guid: 5bb791dbf73814e7eabe898e1648ee51, type: 3}
+  playerPrefab: {fileID: 3810766216351063257, guid: fea5af16d1722440390b52b0f3acc49f, type: 3}
+  isMale: 0
