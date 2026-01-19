@@ -39,6 +39,9 @@ namespace TGL.RPG.Character
         #endregion MonoBehaviourMethods
 
         #region ButtonMethods
+        /// <summary>
+        /// called by Inspector button to go to the next character
+        /// </summary>
         public void NextCharacter()
         {
             currentCharacterIndex++;
@@ -49,6 +52,9 @@ namespace TGL.RPG.Character
             DisplayCharacter(currentCharacterIndex);
         }
         
+        /// <summary>
+        /// called by Inspector button to go to the previous character
+        /// </summary>
         public void PrevCharacter()
         {
             currentCharacterIndex--;
@@ -59,13 +65,16 @@ namespace TGL.RPG.Character
             DisplayCharacter(currentCharacterIndex);
         }
         
+        /// <summary>
+        /// called by Inspector button to confirm the selection and proceed to the main game scene
+        /// </summary>
         public void ConfirmSelection()
         {
-            // currentCharacterIndex // char index
-            // allAvailableCharacters[currentCharacterIndex].characterID; // char ID
-            // allAvailableCharacters[currentCharacterIndex].characterName; // char name
-            
             playerName = nameInputField.text; // In case user has changed the name
+            if (string.IsNullOrEmpty(playerName))
+            {
+                playerName = allAvailableCharacters[currentCharacterIndex].characterName;
+            }
             
             // if we have an old registration, unregister it first
             if (SLocator.GetSlGlobal.HasService<ISelectedCharacter>())

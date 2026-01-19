@@ -6,7 +6,7 @@ using UnityEngine;
 
 public class OpenCharacterSelectionScreen : MonoBehaviour
 {
-    private const int splashTime = 2;
+    private const int splashTime = 1;
     void Start()
     {
         StartCoroutine(EnterGame());

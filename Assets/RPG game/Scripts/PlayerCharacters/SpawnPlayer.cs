@@ -17,6 +17,11 @@ namespace TGL.RPG.Character
             ValidateSerializedFields();
         }
 
+        private void Start()
+        {
+            ChangePlayer();
+        }
+
         private void ValidateSerializedFields()
         {
             if (spawnPoint == null)
@@ -25,9 +30,14 @@ namespace TGL.RPG.Character
             }
         }
 
-
-        private void Start()
+        private void ChangePlayer()
         {
+            // remove old player if exists
+            if(player != null)
+            {
+                Destroy(player);
+            }
+            
             // get the selected player character info from the GameManager
             if (SLocator.GetSlGlobal.TryGet(out playerCharacterInfo))
             {

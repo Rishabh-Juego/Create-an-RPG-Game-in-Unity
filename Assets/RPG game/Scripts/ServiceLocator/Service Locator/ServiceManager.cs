@@ -149,7 +149,7 @@ namespace TGL.ServiceLocator
 			if (!servicesDict.ContainsKey(type))
 			{
 				Debug.LogError($"We do not have the service type ({type.FullName}) that you are trying to unregister", _serviceLocator);
-				throw new ArgumentException($"you are trying to unregister {type.FullName} which is not available in the service locator");
+				// throw new ArgumentException($"you are trying to unregister {type.FullName} which is not available in the service locator");
 			}
 			
 			servicesDict.Remove(type);

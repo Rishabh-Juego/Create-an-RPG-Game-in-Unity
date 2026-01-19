@@ -13,7 +13,14 @@ namespace TGL.RPG.CommunicationBus
         
         public static void PublishMessage(MessageTypes msgType, IMessageBody msgBody)
         {
-            messageSubscribers[msgType]?.ForEach(subscriber => subscriber?.Invoke(msgBody));
+            if (messageSubscribers.ContainsKey(msgType))
+            {
+                messageSubscribers[msgType]?.ForEach(subscriber => subscriber?.Invoke(msgBody));
+            }
+            else
+            {
+                Debug.LogWarning($"We are trying to publish a message type which is not present: {msgType}");
+            }
         }
         
         public static void RegisterMessageListener(MessageTypes msgType, Action<IMessageBody> listener)

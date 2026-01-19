@@ -6,6 +6,8 @@ namespace TGL.RPG.CommunicationBus
         ChangeCursor = 1,
         ShowCursor = 2, // Currently unused. no publish calls for this message type.
         ActivateSingleScene = 3,
+        PlayerMove = 4,
+        CursorOverUI = 5,
         
     }
 }

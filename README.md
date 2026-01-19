@@ -89,6 +89,10 @@ Each player has a camera reference for raycasting as well as reference to Cinema
 To avoid loading errors, each player prefab we made has a camera and cinemachine camera as child objects.
 Male and Female characters have separate animation controllers, so any change in controller, translations, etc. needs to be repeated for both.
 
+#### Inventory
+We are using a simple inventory system.  
+The inventory cannot be opened while in combat or movement and the time should stop when we open the inventory.
+
 #### service locator
 We are unable to use the public service locator package due to some errors.  
 I am using the clone of the service locator from the [github](https://github.com/tglGames-Plugins/tgl-service-locator) project.  
