@@ -4,8 +4,9 @@ namespace TGL.RPG.Items.PickingSystem
 {
     public interface IPicker
     {
-        // You can pass the item's data or the whole object
-        void OnItemPickedUp(IPickable item);
+        void AddPickableToPicker(IPickable item);
+        void RemovePickableFromPicker(IPickable item);
+        bool HasItem(IPickable item);
         
         // Useful for checking if the interactor's hands/inventory are full
         bool CanPickUp { get; }

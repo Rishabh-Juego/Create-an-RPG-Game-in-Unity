@@ -529,3 +529,4 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 84250d856426344989fa3a4dafa63ead, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  pickableData: {fileID: 11400000, guid: 5aec73400c0e141fe82a9671ba4b7005, type: 2}

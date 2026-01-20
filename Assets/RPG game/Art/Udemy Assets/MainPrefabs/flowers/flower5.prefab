@@ -502,6 +502,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 84250d856426344989fa3a4dafa63ead, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  pickableData: {fileID: 11400000, guid: f2d293e46137447cfa5868b9f2d16bcf, type: 2}
 --- !u!1 &169404
 GameObject:
   m_ObjectHideFlags: 0

@@ -6,5 +6,7 @@ namespace TGL.RPG.Items.PickingSystem
     {
         void PickUp(IPicker interactor);
         string GetItemName();
+        Vector3 GetObjectPosition();
+        UniqueScriptable GetObjectData();
     }
 }
