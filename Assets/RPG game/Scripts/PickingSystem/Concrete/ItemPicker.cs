@@ -1,5 +1,8 @@
 using System;
 using System.Collections.Generic;
+using TGL.RPG.CommunicationBus;
+using TGL.RPG.CommunicationBus.Sample;
+using TGL.RPG.Items.InventorySystem.Data;
 using UnityEngine;
 
 namespace TGL.RPG.Items.PickingSystem
@@ -56,8 +59,7 @@ namespace TGL.RPG.Items.PickingSystem
                     // TODO: can replace this with picking all items in range if needed
                     // find and pick up the closest item
                     IPickable closestItem = FindClosestItem();
-                    closestItem.PickUp(this);
-                    pickableItems.Remove(closestItem);
+                    PickItem(closestItem);
                 }
             }
         }
@@ -83,6 +85,18 @@ namespace TGL.RPG.Items.PickingSystem
             }
 
             return closestItem;
+        }
+
+        private void PickItem(IPickable item)
+        {
+            pickableItems.Remove(item);
+            if(item.GetObjectData() is not InventoryItemData inventoryItemData)
+            {
+                Debug.LogError($"Cannot pick item as it is not of {nameof(inventoryItemData)} type.", item.GetObject());
+                return;
+            }
+            MessageBus.PublishMessage(MessageTypes.AddItemToInventory, new AddItemToInventoryEvent(inventoryItemData));
+            item.PickUp(this);
         }
 
         #endregion Private_Methods

@@ -24,6 +24,8 @@ namespace TGL.RPG.Items.PickingSystem.Samples
         
         public Vector3 GetObjectPosition() => transform.position;
         
+        public GameObject GetObject() => gameObject;
+        
         public UniqueScriptable GetObjectData() => pickableData;
         
         public void PickUp(IPicker interactor)
