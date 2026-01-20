@@ -12,6 +12,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: bd4897ed96f134b4683f8a1f3e4b43d2, type: 3}
   m_Name: Male02
   m_EditorClassIdentifier: 
+  itemName: Male_02
+  itemType: 1
   characterID: 5
   characterName: Akbar
   modelPrefab: {fileID: 2891905844197228582, guid: be5bf1beb26b14769b00f1ce2da136e2, type: 3}

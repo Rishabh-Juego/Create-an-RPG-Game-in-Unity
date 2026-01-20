@@ -6,7 +6,8 @@ namespace TGL.RPG.Constants.Sample
     {
         public static class ScriptableConstants
         {
-            public static string gameCharactersPath = "ScriptableObjects/AvailableCharacters"; // "Assets/RPG Game/Resources/ScriptableObjects/AvailableCharacters.asset";
+            public static string gameCharactersPath = "ScriptableObjects/Characters/AvailableCharacters"; // Assets/RPG Game/Resources/ScriptableObjects/Characters/AvailableCharacters.asset
+            
         }
     }
 }

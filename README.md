@@ -69,7 +69,8 @@ Using the Cinemachine package for camera system.
 - As players can change and references set through inspector can be lost, we are setting the `CinemachineCamera` and `Camera` references through `CameraRegistry.cs` registry.  
 
 > Cinemachine Target needs to be set after player is instantiated, Currently we are not setting this.
-> When a player changes, "PlayerCharacter" -> "Player model parent" -> "TargetPos" => we can add our prefab as child to "Player model parent" at local position (0,0,0).
+> When a player changes, "PlayerCharacter" -> "Player model parent" -> "TargetPos" => 
+> we can add our prefab as child to "Player model parent" at local position (0,0,0).
 > We then set the `CinemachineCamera`'s Target to this instantiated object.
 
 #### Cursors
@@ -86,12 +87,28 @@ We do not want to tightly couple different systems together.
 
 #### Player
 Each player has a camera reference for raycasting as well as reference to Cinemachine camera for position, rotation and zoom.  
-To avoid loading errors, each player prefab we made has a camera and cinemachine camera as child objects.
-Male and Female characters have separate animation controllers, so any change in controller, translations, etc. needs to be repeated for both.
+To avoid loading errors, each player prefab we made gets camera and raycast services from the service locator on `Awake()`.  
+> Male and Female characters have separate animation controllers, so any change in controller, translations, etc. 
+> needs to be repeated for both.  
+
+Each player prefab has a box collider which is marked as trigger for interaction detection.  
+We tagged each player prefab with "Player" tag for easy identification in scripts.  
+
 
 #### Inventory
 We are using a simple inventory system.  
-The inventory cannot be opened while in combat or movement and the time should stop when we open the inventory.
+> To do later : The inventory cannot be opened while in combat or when player is in movement and the time 
+> should stop when we open the inventory.   
+
+
+We want to show an icon when an item is placed in the inventory, similarly, when an item is removed, we want to 
+remove the icon and re-instantiate the 3d object. To achieve this, each item should know the icon to be shown in 
+the inventory as well as each icon needs to know the 3D object it represents. This can be achieved by creating a 
+ScriptableObject for each item. But letting 'Asset Database GUID' handle this has the risk of deleting data and 
+loosing the references. To avoid this, we are creating our own unique identifier for each item, 
+see `TGL.RPG.IdentityRegistry` namespace.  
+
+
 
 #### service locator
 We are unable to use the public service locator package due to some errors.  
@@ -99,3 +116,14 @@ I am using the clone of the service locator from the [github](https://github.com
 We use service locator to register and retrieve services in the game.
 - `SelectedCharacterInfoData.cs` is used to save the selected character information data. which is held in the service locator.
 - `GameCamera.cs`(`IActiveCameraProvider.cs`) is used to save the active camera provider. which is held in the service locator.
+
+
+#### Identity Registry
+We are using `TGL.RPG.IdentityRegistry` namespace to manage unique identifiers for different scriptable objects.
+- `UniqueScriptable` is the base class for all unique identifiers.
+- `UniqueType` is used to define different types of unique identifiers.
+- `IUniqueId` is used to define the parameters for unique identifiers.
+- `ItemRegistry` is a static class that will run only in editor to check/verify all unique identifiers in the project.
+
+This system ensures that each scriptable object has a unique identifier that can be used to reference it without 
+relying on Unity's Asset Database GUIDs, which can be lost or changed if objects are deleted.

@@ -10,10 +10,12 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: bd4897ed96f134b4683f8a1f3e4b43d2, type: 3}
-  m_Name: Female01
+  m_Name: Male01
   m_EditorClassIdentifier: 
-  characterID: 1
-  characterName: Sarah
-  modelPrefab: {fileID: 5016298688100339028, guid: 5bb791dbf73814e7eabe898e1648ee51, type: 3}
-  playerPrefab: {fileID: 3810766216351063257, guid: fea5af16d1722440390b52b0f3acc49f, type: 3}
-  isMale: 0
+  itemName: Male_01
+  itemType: 1
+  characterID: 4
+  characterName: Rahul
+  modelPrefab: {fileID: 7206682636741963407, guid: 4eb945f98d9014891b0dae9b18160a0d, type: 3}
+  playerPrefab: {fileID: 1584797425367575467, guid: ea484590908294e0893c8217364f40c5, type: 3}
+  isMale: 1

@@ -10,10 +10,12 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: bd4897ed96f134b4683f8a1f3e4b43d2, type: 3}
-  m_Name: Female02
+  m_Name: Male03
   m_EditorClassIdentifier: 
-  characterID: 2
-  characterName: Pooja
-  modelPrefab: {fileID: 6334302851764699819, guid: c2f8a8ab656ef4654b72139cf94d1457, type: 3}
-  playerPrefab: {fileID: 1553550709328000189, guid: f9c9b0e4d16a64027bae0255922e543b, type: 3}
-  isMale: 0
+  itemName: Male_03
+  itemType: 1
+  characterID: 6
+  characterName: Jeetu
+  modelPrefab: {fileID: 6897296757967142122, guid: 626e4eb5ba52749a68a8d9adc7f6cb67, type: 3}
+  playerPrefab: {fileID: 6228220473464169923, guid: 85dab7b94bc2a446dba72d657fa3c8f9, type: 3}
+  isMale: 1

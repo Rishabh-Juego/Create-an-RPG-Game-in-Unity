@@ -1,19 +1,17 @@
+using System;
+using TGL.RPG.IdentityRegistry;
 using UnityEngine;
 
 
 namespace TGL.RPG.Data.Character
 {
     [CreateAssetMenu(fileName = "CharacterInfo", menuName = "Scriptable Objects/CharacterInfo")]
-    public class CharacterInfo : ScriptableObject
+    public class CharacterInfo : UniqueScriptable
     {
-        /// <summary>
-        /// unique ID of the character
-        /// </summary>
-        public int characterID; 
         /// <summary>
         /// Default name of the character
         /// </summary>
-        public string characterName;
+        [Space(10), Header("CharacterInfo"), Space(5)]public string characterName;
         /// <summary>
         /// player model with only idle animation
         /// </summary>
@@ -26,5 +24,10 @@ namespace TGL.RPG.Data.Character
         /// in case we want to have gender discrimination
         /// </summary>
         public bool isMale;
+
+        private void OnValidate()
+        {
+            ItemRegistry.CheckIsDuplicate(this);
+        }
     }
 }
