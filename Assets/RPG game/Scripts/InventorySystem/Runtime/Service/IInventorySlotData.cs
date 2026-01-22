@@ -5,17 +5,17 @@ using UnityEngine;
 
 namespace TGL.RPG.Items.InventorySystem
 {
-    public interface IInventorySlotData<T> where T : So_InventoryData
+    public interface IInventorySlotData<SO_T> where SO_T : So_InventoryData
     {
-        event Action<IInventorySlotData<T>, int> OnSlotChanged;
+        event Action<IInventorySlotData<SO_T>, int> OnSlotChanged;
         
-        T ContainedItemData { get; }
+        SO_T ContainedItemData { get; }
         
         int ItemCount { get; }
         int SlotIndex { get; }
 
-        void Initialize(int index, T defaultItem);
-        void UpdateSlot(T itemData, int count);
+        void Initialize(int index, SO_T defaultItem);
+        void UpdateSlot(SO_T itemData, int count);
         void ClearSlot();
     }
 }

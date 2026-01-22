@@ -3,9 +3,25 @@ using UnityEngine ;
 
 namespace TGL.RPG.CommandPattern
 {
-    public interface ICommand<T> where T : class
+    public interface ICommand { }
+
+    public interface Command : ICommand
     {
-        CommandResult<T> Execute();
+        ICommandResult Execute();
+        bool Undo();
+    }
+    
+    public interface ICommand<T> : ICommand where T : class 
+    {
+        T Data { get; }
+        CommandResult Execute();
+        bool Undo();
+    }
+    
+    public interface ICommand<T, V> : ICommand where T : class where V : class
+    {
+        T Data { get; }
+        CommandResult<V> Execute();
         bool Undo();
     }
 }

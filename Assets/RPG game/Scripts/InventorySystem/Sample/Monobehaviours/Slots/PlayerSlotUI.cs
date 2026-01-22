@@ -24,7 +24,7 @@ namespace TGL.RPG.Items.InventorySystem.Samples
             _slotData = slotData;
             itemCount = 0;
             countText.text = itemCount.ToString("00");
-            slotData.OnSlotChanged += UpdateReferences;
+            _slotData.OnSlotChanged += UpdateReferences;
             UpdateUI();
         }
         
@@ -38,10 +38,17 @@ namespace TGL.RPG.Items.InventorySystem.Samples
 
         private void UpdateReferences(IInventorySlotData<U> dataRef, int newCount)
         {
-            _slotData = dataRef;
-            itemCount = dataRef.ItemCount;
-            itemCount = newCount;
-            UpdateUI();
+            if (dataRef is T concreteData)
+            {
+                _slotData = concreteData;
+                itemCount = dataRef.ItemCount;
+                itemCount = newCount;
+                UpdateUI();
+            }
+            else
+            {
+                Debug.LogError($"Slot Changed update came with type {dataRef.GetType().FullName}, but we were expecting type {typeof(T).FullName}", gameObject);
+            }
         }
 
         public void UpdateUI()

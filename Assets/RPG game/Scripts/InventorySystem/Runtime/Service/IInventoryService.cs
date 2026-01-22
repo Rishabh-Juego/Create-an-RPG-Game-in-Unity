@@ -5,18 +5,20 @@ using UnityEngine;
 
 namespace TGL.RPG.Items.InventorySystem
 {
-    public interface IInventoryService<T, U> where T : So_InventoryData where U : IInventorySlotData<T>
+    public interface IInventoryService<SO_T, U> where SO_T : So_InventoryData where U : IInventorySlotData<SO_T>
     {
         UniqueType InventoryType { get; }
         event Action OnInventoryChanged;
-        void Initialize(int slotSize, T defaultOrNullItem);
+        void Initialize(int slotSize, SO_T defaultOrNullItem);
         U[] GetAllItems();
         
-        T DefaultOrNullItem { get; }
+        SO_T DefaultOrNullItem { get; }
         
-        bool CanAddItem(T item);
-        bool TryAddItem(T item);
-        bool RemoveItemFromInventory(T item);
+        bool CanAddItem(SO_T item);
+        bool TryAddItem(SO_T item);
+        bool TryAddItems(SO_T item, int count);
+        bool TryRemoveItem(SO_T item);
+        bool TryRemoveItems(SO_T item, int count);
         
         void ClearInventory();
     }

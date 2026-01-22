@@ -279,6 +279,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 84250d856426344989fa3a4dafa63ead, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  count: 3
   moveStep: 0.5
   minCloseness: 0.2
   pickableData: {fileID: 11400000, guid: c4e798416406f466e847ca5deb1c64a0, type: 2}

@@ -1,11 +1,8 @@
 using System;
 using System.Collections.Generic;
-using TGL.RPG.CommunicationBus;
-using TGL.RPG.CommunicationBus.Sample;
-using TGL.RPG.IdentityRegistry;
-using TGL.RPG.Items.InventorySystem;
+using TGL.RPG.CommandPattern;
+using TGL.RPG.CommandPattern.Samples;
 using TGL.RPG.Items.InventorySystem.Data;
-using TGL.ServiceLocator;
 using UnityEngine;
 using UnityEngine.InputSystem;
 
@@ -102,74 +99,18 @@ namespace TGL.RPG.Items.PickingSystem
                 Debug.LogError($"Cannot pick item as it is not of {nameof(So_InventoryData)} type.", item.GetObject());
                 return;
             }
-            // MessageBus.PublishMessage(MessageTypes.AddItemToInventory, new AddItemToInventoryEvent(inventoryItemData));
-
-            bool itemPickedUp = false;
-            switch (inventoryData.UniqueType)
+            
+            InventoryResult addResult = AddItemToInventoryCmd.CreateAndRun(inventoryData, item.GetObjectCount());
+            if (addResult.IsSuccess)
             {
-                case UniqueType.Item:
-                    if (SLocator.GetSlGlobal.TryGet(out IInventoryService<So_InventoryItemData, ItemSlotData> playerItemInventoryService))
-                    {
-                        if (inventoryData is So_InventoryItemData itemData)
-                        {
-                            if (playerItemInventoryService.TryAddItem(itemData))
-                            {
-                                item.PickUp(this);
-                                itemPickedUp = true;
-                            }
-                        }
-                    }
-                    else
-                    {
-                        Debug.LogWarning($"No inventory service found for items when picking up {item.GetItemName()} of type {inventoryData.UniqueType}.", item.GetObject());
-                    }
-                    break;
-                case UniqueType.Magic:
-                    if (SLocator.GetSlGlobal.TryGet(out IInventoryService<So_InventoryMagicData, MagicSlotData> playerMagicInventoryService))
-                    {
-                        if (inventoryData is So_InventoryMagicData magicData)
-                        {
-                            if (playerMagicInventoryService.TryAddItem(magicData))
-                            {
-                                item.PickUp(this);
-                                itemPickedUp = true;
-                            }
-                        }
-                    }
-                    else
-                    {
-                        Debug.LogWarning($"No inventory service found for items when picking up {item.GetItemName()} of type {inventoryData.UniqueType}.", item.GetObject());
-                    }
-                    break;
-                case UniqueType.Spell:
-                    if (SLocator.GetSlGlobal.TryGet(out IInventoryService<So_InventorySpellData, SpellSlotData> playerSpellInventoryService))
-                    {
-                        if (inventoryData is So_InventorySpellData spellData)
-                        {
-                            if (playerSpellInventoryService.TryAddItem(spellData))
-                            {
-                                item.PickUp(this);
-                                itemPickedUp = true;
-                            }
-                        }
-                    }
-                    else
-                    {
-                        Debug.LogWarning($"No inventory service found for items when picking up {item.GetItemName()} of type {inventoryData.UniqueType}.", item.GetObject());
-                    }
-                    break;
-            }
-
-            if (!itemPickedUp)
-            {
-                Debug.LogWarning($"Failed to pick item {item.GetItemName()} to inventory.", item.GetObject()); 
+                item.PickUp(this);
+                pickableItems.Remove(item);
             }
             else
             {
-                pickableItems.Remove(item);
+                Debug.LogWarning($"Failed to pick item {item.GetItemName()} to inventory.", item.GetObject());
             }
         }
-        
         #endregion Private_Methods
     }
 }

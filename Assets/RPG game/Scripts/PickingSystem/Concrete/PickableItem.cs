@@ -10,6 +10,7 @@ namespace TGL.RPG.Items.PickingSystem.Samples
     public class PickableItem : MonoBehaviour, IPickableItem
     {
         #region Variables
+        [SerializeField] private int count = 1;
         [Header("Picking Animation Variables")]
         [SerializeField, Tooltip("The amount of distance it jumps in a single frame"), Range(0.1f, 0.9f)] private float moveStep = 0.5f;
         [SerializeField, Tooltip("The minimum distance this object gets to the target before disappearing"), Range(0.1f, 3f)] private float minCloseness = 0.2f;
@@ -28,12 +29,13 @@ namespace TGL.RPG.Items.PickingSystem.Samples
         
         public So_UniqueScriptable GetObjectData() => pickableData;
         
+        public int GetObjectCount() => count;
+
         public void PickUp(IPicker interactor)
         {
             Transform target = interactor.InteractionTransform;
             _moveTowardsPicker = StartCoroutine(MoveTowardsPicker(target));
         }
-        
         #endregion Interface_Methods
 
         

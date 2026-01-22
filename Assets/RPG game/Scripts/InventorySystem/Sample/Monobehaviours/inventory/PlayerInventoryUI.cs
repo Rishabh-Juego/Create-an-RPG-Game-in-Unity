@@ -41,23 +41,25 @@ namespace TGL.RPG.Items.InventorySystem.Samples
                 Debug.LogError($"We have {allItemsData.Length} data items but {AllSlotsUI.Count} UI slots. Something went wrong!", gameObject);
                 return;
             }
-            
+
+            U itemData;
+            V slotUI;
             // initialize each slot UI with corresponding data
             for (int i = 0; i < allItemsData.Length; i++)
             {
-                U itemData = allItemsData[i];
-                V slotUI = AllSlotsUI[i];
+                itemData = allItemsData[i];
+                slotUI = AllSlotsUI[i];
                 slotUI.Initialize(itemData);
             }
         }
         
         protected virtual void UnassignSlotDataFromUi()
-        {            
+        {
+            V slotUI;
             // initialize each slot UI with corresponding data
             for (int i = 0; i < AllSlotsUI.Count; i++)
             {
-                
-                V slotUI = AllSlotsUI[i];
+                slotUI = AllSlotsUI[i];
                 slotUI.DeInitialize();
             }
         }

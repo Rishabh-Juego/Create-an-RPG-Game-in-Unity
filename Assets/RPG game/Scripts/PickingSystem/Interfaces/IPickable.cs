@@ -10,5 +10,6 @@ namespace TGL.RPG.Items.PickingSystem
         GameObject GetObject();
         Vector3 GetObjectPosition();
         So_UniqueScriptable GetObjectData();
+        int GetObjectCount();
     }
 }

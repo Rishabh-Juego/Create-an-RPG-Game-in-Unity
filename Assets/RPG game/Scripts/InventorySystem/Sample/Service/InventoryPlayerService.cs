@@ -130,6 +130,79 @@ namespace TGL.RPG.Items.InventorySystem.Samples
 
             return false;
         }
+        
+        public bool TryAddItems(SO_U item, int itemCount)
+        {
+            if (!_initialized)
+            {
+                Debug.LogError($"Cannot try to remove item for uninitialized inventory of type {InventoryType}.");
+                return false;
+            }
+
+            if (_defaultOrNullItem == item)
+            {
+                Debug.LogError($"Cannot remove default item from inventory of type {InventoryType}.");
+                return false;
+            }
+            
+            int emptySlotCount = slotItems.Count(x => x.ContainedItemData == _defaultOrNullItem);
+            int sameItemSlotsCount = slotItems.Count(x => x.ContainedItemData == item);
+            int availableItemCountInInventory = slotItems.Where(x => x.ContainedItemData == item).Sum(x => x.ItemCount);
+            int availableSpaceInSameItemSlots = sameItemSlotsCount * item.maxStackCount - availableItemCountInInventory;
+            int maxCountIfUsingEmptySlots = emptySlotCount * item.maxStackCount;
+            int maxInventoryAddCapacity = availableSpaceInSameItemSlots + maxCountIfUsingEmptySlots;
+            if (itemCount > maxInventoryAddCapacity)
+            {
+                Debug.LogWarning($"we can add {maxInventoryAddCapacity} items of type {item.name} but tried to add {itemCount} items.");
+                return false;
+            }
+
+            int itemsLeftToAdd = itemCount;
+            // add in same item slots first
+            foreach (T sameItemSlot in slotItems.Where(x => x.ContainedItemData == item && x.ItemCount < x.ContainedItemData.maxStackCount))
+            {
+                int spaceInThisSlot = sameItemSlot.ContainedItemData.maxStackCount - sameItemSlot.ItemCount;
+                if (itemsLeftToAdd <= spaceInThisSlot)
+                {
+                    // we can add all remaining items in this slot
+                    sameItemSlot.UpdateSlot(sameItemSlot.ContainedItemData, sameItemSlot.ItemCount + itemsLeftToAdd);
+                    OnInventoryChanged?.Invoke();
+                    AggregateInventorySlotsForItem(item);
+                    return true;
+                }
+                else
+                {
+                    // fill this slot and continue to next
+                    sameItemSlot.UpdateSlot(sameItemSlot.ContainedItemData, sameItemSlot.ContainedItemData.maxStackCount);
+                    itemsLeftToAdd -= spaceInThisSlot;
+                }
+            }
+
+            if (itemsLeftToAdd > 0)
+            {
+                // add items in empty slots
+                foreach (T emptySlot in slotItems.Where(x => x.ContainedItemData == _defaultOrNullItem))
+                {
+                    if (itemsLeftToAdd <= item.maxStackCount)
+                    {
+                        // we can add all remaining items in this slot
+                        emptySlot.UpdateSlot(item, itemsLeftToAdd);
+                        OnInventoryChanged?.Invoke();
+                        AggregateInventorySlotsForItem(item);
+                        return true;
+                        // loop stops at return, so break is not needed
+                    }
+                    else
+                    {
+                        emptySlot.UpdateSlot(emptySlot.ContainedItemData, item.maxStackCount);
+                        itemsLeftToAdd -= item.maxStackCount;
+                    }
+                }
+            }
+
+            Debug.LogError($"We had the capacity to add {itemCount} items of type {item.name} but something went wrong.");
+            return false;
+        }
 
         /// <summary>
         /// Try to remove item from anywhere, for actions like unlocking a door using key from inventory, <br/>
@@ -137,7 +210,7 @@ namespace TGL.RPG.Items.InventorySystem.Samples
         /// </summary>
         /// <param name="item">The item we want to get from the inventory</param>
         /// <returns>was the item removed from the inventory?</returns>
-        public bool RemoveItemFromInventory(SO_U item)
+        public bool TryRemoveItem(SO_U item)
         {
             if (!_initialized)
             {
@@ -151,36 +224,42 @@ namespace TGL.RPG.Items.InventorySystem.Samples
                 return false;
             }
 
-            int itemCount;
+            int sameItemSlotsCount;
             T sameItemSlot = slotItems.FirstOrDefault(x => x.ContainedItemData == item);
             if (sameItemSlot != null)
             {
-                itemCount = sameItemSlot.ItemCount;
+                sameItemSlotsCount = sameItemSlot.ItemCount;
                 // we found a slot with the same item, we can add it
-                if (itemCount >= 1)
+                if (sameItemSlotsCount >= 1)
                 {
-                    if (itemCount == 1)
+                    if (sameItemSlotsCount == 1)
                     {
                         sameItemSlot.ClearSlot();
                     }
                     else
                     {
-                        sameItemSlot.UpdateSlot(sameItemSlot.ContainedItemData, itemCount - 1);
+                        sameItemSlot.UpdateSlot(sameItemSlot.ContainedItemData, sameItemSlotsCount - 1);
                     }
 
-                    AggregateInventorySlot(item);
+                    AggregateInventorySlotsForItem(item);
                     OnInventoryChanged?.Invoke();
                     return true;
                 }
             }
             return false;
         }
+
+        public bool TryRemoveItems(SO_U item, int itemCount)
+        {
+            Debug.LogError($"We have not implemented {nameof(TryRemoveItems)} in inventory of type {InventoryType} yet.");
+            return false;
+        }
         
         /// <summary>
-        /// after removal of an item, we need to aggregate the slots to avoid fragmentation
+        /// after change of an item, we need to aggregate the slots to avoid fragmentation of same items across multiple slots
         /// </summary>
         /// <param name="item"></param>
-        protected void AggregateInventorySlot(SO_U item)
+        protected void AggregateInventorySlotsForItem(SO_U item)
         {
             List<T> sameItemSlots = slotItems.Where(x => x.ContainedItemData == item).ToList();
             int totalItemCount = sameItemSlots.Sum(x => x.ItemCount);
