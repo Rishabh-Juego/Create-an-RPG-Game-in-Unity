@@ -23,6 +23,7 @@ namespace TGL.ServiceLocator
 		private static readonly string k_sceneServiceLocatorName = "ServiceLocator [Scene]";
 		
 		public ServiceLocatorType serviceLocatorType = ServiceLocatorType.Undefined;
+		private static bool AppIsQuitting;
 #if Testing
 		public List<string> allRegisteredTypes;
 		private void Update()
@@ -30,7 +31,11 @@ namespace TGL.ServiceLocator
 			allRegisteredTypes = serviceManager.RegisteredTypes.Select(service => service.FullName).ToList();
 		}
 #endif
-		
+		private void OnApplicationQuit()
+		{
+			AppIsQuitting = true;
+		}
+
 		#region ConfiguringServiceLocator
 
 		/// <summary>
@@ -122,6 +127,11 @@ namespace TGL.ServiceLocator
 					// if globalLocator is already assigned, return it.
 					return globalLocator;
 				}
+
+				if (AppIsQuitting)
+				{
+					return null;
+				}
 				
 				// Find the Bootstrapper for global Service locator if available, we might have only missed bootstrapping it to our locator
 				if (FindFirstObjectByType<ServiceLocatorGlobalBootstrapper>() is { } foundBootstrapper)
@@ -168,10 +178,13 @@ namespace TGL.ServiceLocator
 				}
 				else
 				{
-					Debug.LogWarning($"we have the scene but do not have a {nameof(SLocator)} attached to this scene in {nameof(SceneContainers)}", contextMb);
+					if (!AppIsQuitting)
+					{
+						Debug.LogWarning($"we have the scene but do not have a {nameof(SLocator)} attached to this scene in {nameof(SceneContainers)}", contextMb);
+					}
 				}
 			}
-			else
+			else if(!AppIsQuitting)
 			{
 				// look for a Service locator in the scene which we might have missed to add to 'SceneContainers' list 
 				tmpSceneGameObjects.Clear();
@@ -352,7 +365,7 @@ namespace TGL.ServiceLocator
 				return false;
 			}
 			attachedLocator = currScope.serviceLocatorType < ServiceLocatorType.Scene ? GetSlForSceneOf(this) : GetSlGlobal;
-			return attachedLocator != null;
+			return attachedLocator is not null;
 		}
 
 		/// <summary>

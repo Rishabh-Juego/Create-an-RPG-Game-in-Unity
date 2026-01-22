@@ -15,5 +15,6 @@ MonoBehaviour:
   itemName: Item_Red_Mushroom_01
   itemType: 2
   DisplayName: Red Mushroom
-  itemIcon: {fileID: 21300000, guid: 93a09802d10bd4ae5a47eea7c24444fa, type: 3}
-  itemPrefab: {fileID: 163506, guid: 20a21dd3c983a2940bcafe4182bcaceb, type: 3}
+  objectIcon: {fileID: 21300000, guid: 93a09802d10bd4ae5a47eea7c24444fa, type: 3}
+  objectPrefab: {fileID: 163506, guid: 20a21dd3c983a2940bcafe4182bcaceb, type: 3}
+  maxStackCount: 3

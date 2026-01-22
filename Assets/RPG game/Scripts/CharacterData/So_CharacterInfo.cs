@@ -6,7 +6,7 @@ using UnityEngine;
 namespace TGL.RPG.Data.Character
 {
     [CreateAssetMenu(fileName = "CharacterInfo", menuName = "Scriptable Objects/CharacterInfo")]
-    public class CharacterInfo : UniqueScriptable
+    public class So_CharacterInfo : So_UniqueScriptable
     {
         /// <summary>
         /// Default name of the character

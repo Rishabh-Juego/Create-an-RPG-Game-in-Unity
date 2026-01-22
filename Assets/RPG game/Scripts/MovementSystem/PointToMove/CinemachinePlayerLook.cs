@@ -59,17 +59,17 @@ namespace TGL.RPG.Navigation.PTM
                 HandleChangeCameraZoom();
             }
             
-            // TODO: Replace with input system
-            if (Input.GetMouseButtonDown(1)) // Right Click
+            
+            if (UnityEngine.InputSystem.Mouse.current.rightButton.wasPressedThisFrame) // Right Click
             {
                 // TODO: Find a way to decouple Cursor from this class
                 MessageBus.PublishMessage(MessageTypes.ChangeCursor, new ChangeCursorEvent(CursorTypes.MoveCamera));
             }
-            if (Input.GetMouseButton(1)) // Right Click
+            if (UnityEngine.InputSystem.Mouse.current.rightButton.isPressed) // Right Click
             {
                 HandleChangeCameraAngles();
             }
-            if (Input.GetMouseButtonUp(1)) // Right Click
+            if (UnityEngine.InputSystem.Mouse.current.rightButton.wasReleasedThisFrame) // Right Click
             {
                 // TODO: Find a way to decouple Cursor from this class
                 MessageBus.PublishMessage(MessageTypes.ChangeCursor, new ChangeCursorEvent(CursorTypes.Basic));

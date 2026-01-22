@@ -5,6 +5,7 @@ using TGL.RPG.CommunicationBus.Sample;
 using TGL.ServiceLocator;
 using UnityEngine;
 using UnityEngine.EventSystems;
+using UnityEngine.InputSystem;
 
 namespace TGL.RPG.Mouse
 {
@@ -31,13 +32,12 @@ namespace TGL.RPG.Mouse
         // Public property for other Scripts to read
         public bool IsOverUI
         {
-            get { return isOverUI; }
+            get => isOverUI;
             set
             {
-                if (value == isOverUI) return;
-                
+                if (value.Equals(isOverUI)) return;
                 isOverUI = value;
-                MessageBus.PublishMessage(MessageTypes.CursorOverUI, new CursorOverUiEvent(value));
+                // MessageBus.PublishMessage(MessageTypes.CursorOverUI, new CursorOverUiEvent(value));
             }
         }
         
@@ -57,7 +57,7 @@ namespace TGL.RPG.Mouse
 
         private void OnDestroy()
         {
-            SLocator.GetSlGlobal.UnRegister(typeof(IDetectUiInteraction));
+            SLocator.GetSlGlobal?.UnRegister(typeof(IDetectUiInteraction));
         }
         #endregion MonoBehaviourMethods
 
@@ -74,9 +74,9 @@ namespace TGL.RPG.Mouse
                 eventData = new PointerEventData(eventSystem);
             }
 
-            // TODO: Expand for touch input if needed, plan for new input system if possible
-            bool anyButtonHeld = Input.GetMouseButton(0) || Input.GetMouseButton(1) || Input.GetMouseButton(2); 
-            bool anyButtonDown = Input.GetMouseButtonDown(0) || Input.GetMouseButtonDown(1) || Input.GetMouseButtonDown(2);
+            // TODO: Expand for touch input if needed
+            bool anyButtonHeld = UnityEngine.InputSystem.Mouse.current.leftButton.isPressed || UnityEngine.InputSystem.Mouse.current.rightButton.isPressed || UnityEngine.InputSystem.Mouse.current.middleButton.isPressed; 
+            bool anyButtonDown = UnityEngine.InputSystem.Mouse.current.leftButton.wasPressedThisFrame || UnityEngine.InputSystem.Mouse.current.rightButton.wasPressedThisFrame || UnityEngine.InputSystem.Mouse.current.middleButton.wasPressedThisFrame;
 
             if (!anyButtonHeld)
             {

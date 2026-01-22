@@ -90,7 +90,7 @@ BoxCollider:
   m_ProvidesContacts: 0
   m_Enabled: 1
   serializedVersion: 3
-  m_Size: {x: 0.51, y: 1.2, z: 0.62}
+  m_Size: {x: 1, y: 1.2, z: 1}
   m_Center: {x: 0, y: 0, z: 0}
 --- !u!114 &7599710675053108388
 MonoBehaviour:
@@ -104,6 +104,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 84250d856426344989fa3a4dafa63ead, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  moveStep: 0.5
+  minCloseness: 0.2
   pickableData: {fileID: 11400000, guid: 8aad554da5bf142bf892852a81c7ef53, type: 2}
 --- !u!1 &109290
 GameObject:

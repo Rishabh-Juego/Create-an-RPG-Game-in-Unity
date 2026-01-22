@@ -1,5 +1,6 @@
 using System;
 using System.Collections;
+using TGL.RPG.IdentityRegistry;
 using TGL.RPG.Items.InventorySystem.Data;
 using UnityEngine;
 using TGL.RPG.Items.PickingSystem;
@@ -9,12 +10,11 @@ namespace TGL.RPG.Items.PickingSystem.Samples
     public class PickableItem : MonoBehaviour, IPickableItem
     {
         #region Variables
-        [SerializeField, Range(0.1f, 0.9f)] private float moveStep = 0.5f;
-        
-        [SerializeField, Range(0.1f, 3f)] private float minCloseness = 0.2f;
-        
-        [SerializeField] private InventoryItemData pickableData;
-        
+        [Header("Picking Animation Variables")]
+        [SerializeField, Tooltip("The amount of distance it jumps in a single frame"), Range(0.1f, 0.9f)] private float moveStep = 0.5f;
+        [SerializeField, Tooltip("The minimum distance this object gets to the target before disappearing"), Range(0.1f, 3f)] private float minCloseness = 0.2f;
+        [SerializeField, Tooltip("The scriptable Object that has all info about this model")] private So_InventoryData pickableData;
+        private Coroutine _moveTowardsPicker;
         #endregion Variables
 
         
@@ -26,12 +26,12 @@ namespace TGL.RPG.Items.PickingSystem.Samples
         
         public GameObject GetObject() => gameObject;
         
-        public UniqueScriptable GetObjectData() => pickableData;
+        public So_UniqueScriptable GetObjectData() => pickableData;
         
         public void PickUp(IPicker interactor)
         {
             Transform target = interactor.InteractionTransform;
-            StartCoroutine(MoveTowardsPicker(target));
+            _moveTowardsPicker = StartCoroutine(MoveTowardsPicker(target));
         }
         
         #endregion Interface_Methods

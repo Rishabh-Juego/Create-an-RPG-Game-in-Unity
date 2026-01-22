@@ -27,7 +27,7 @@ namespace TGL.RPG.CameraManagement
         private void OnDestroy() 
         {
             
-            SLocator.GetSlGlobal.UnRegister(typeof(IActiveCameraProvider));
+            SLocator.GetSlGlobal?.UnRegister(typeof(IActiveCameraProvider));
         }
     }
 }

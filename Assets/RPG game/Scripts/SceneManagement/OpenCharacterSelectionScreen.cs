@@ -4,17 +4,23 @@ using TGL.RPG.CommunicationBus;
 using TGL.RPG.CommunicationBus.Sample;
 using UnityEngine;
 
-public class OpenCharacterSelectionScreen : MonoBehaviour
+namespace TGL.RPG.Character
 {
-    private const int splashTime = 1;
-    void Start()
-    {
-        StartCoroutine(EnterGame());
-    }
 
-    private static IEnumerator EnterGame()
+
+    public class OpenCharacterSelectionScreen : MonoBehaviour
     {
-        yield return new WaitForSeconds(splashTime);
-        MessageBus.PublishMessage(MessageTypes.ActivateSingleScene, new ChangeSceneEvent(AppSceneTypes.CharacterSelectionScene)); // change scene
+        private const int splashTime = 1;
+
+        void Start()
+        {
+            StartCoroutine(EnterGame());
+        }
+
+        private static IEnumerator EnterGame()
+        {
+            yield return new WaitForSeconds(splashTime);
+            MessageBus.PublishMessage(MessageTypes.ActivateSingleScene, new ChangeSceneEvent(AppSceneTypes.CharacterSelectionScene)); // change scene
+        }
     }
 }

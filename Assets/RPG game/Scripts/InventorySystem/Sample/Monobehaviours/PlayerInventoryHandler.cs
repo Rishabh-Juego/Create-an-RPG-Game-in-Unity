@@ -49,9 +49,9 @@ namespace TGL.RPG.Items.InventorySystem.Samples
             playerSpellInventoryService.OnInventoryChanged -= playerInventorySpellUI.UpdateUI;
             
             // unregister from service locator
-            SLocator.GetSlGlobal.UnRegister(playerItemInventoryService);
-            SLocator.GetSlGlobal.UnRegister(playerMagicInventoryService);
-            SLocator.GetSlGlobal.UnRegister(playerSpellInventoryService);
+            SLocator.GetSlGlobal?.UnRegister(playerItemInventoryService);
+            SLocator.GetSlGlobal?.UnRegister(playerMagicInventoryService);
+            SLocator.GetSlGlobal?.UnRegister(playerSpellInventoryService);
         }
     }
 }

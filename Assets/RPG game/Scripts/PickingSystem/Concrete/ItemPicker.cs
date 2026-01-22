@@ -2,8 +2,12 @@ using System;
 using System.Collections.Generic;
 using TGL.RPG.CommunicationBus;
 using TGL.RPG.CommunicationBus.Sample;
+using TGL.RPG.IdentityRegistry;
+using TGL.RPG.Items.InventorySystem;
 using TGL.RPG.Items.InventorySystem.Data;
+using TGL.ServiceLocator;
 using UnityEngine;
+using UnityEngine.InputSystem;
 
 namespace TGL.RPG.Items.PickingSystem
 {
@@ -52,14 +56,18 @@ namespace TGL.RPG.Items.PickingSystem
 
         private void Update()
         {
-            if (Input.GetKeyDown(KeyCode.P)) // TODO: Replace with input system
+            if (pickableItems.Count > 0)
             {
-                if (pickableItems.Count > 0)
+                if (Keyboard.current.pKey.wasPressedThisFrame) // P key to pick up closest item
                 {
-                    // TODO: can replace this with picking all items in range if needed
                     // find and pick up the closest item
                     IPickable closestItem = FindClosestItem();
                     PickItem(closestItem);
+                }
+                else if (Keyboard.current.oKey.wasPressedThisFrame) // O key to pick up all items in range
+                {
+                    IPickable[] allRangedItems = pickableItems.ToArray();
+                    Array.ForEach(allRangedItems, PickItem); // 'PickItem' updates 'pickableItems', so we cannot use `pickableItems.ForEach(PickItem)`
                 }
             }
         }
@@ -89,16 +97,79 @@ namespace TGL.RPG.Items.PickingSystem
 
         private void PickItem(IPickable item)
         {
-            pickableItems.Remove(item);
-            if(item.GetObjectData() is not InventoryItemData inventoryItemData)
+            if(item.GetObjectData() is not So_InventoryData inventoryData)
             {
-                Debug.LogError($"Cannot pick item as it is not of {nameof(inventoryItemData)} type.", item.GetObject());
+                Debug.LogError($"Cannot pick item as it is not of {nameof(So_InventoryData)} type.", item.GetObject());
                 return;
             }
-            MessageBus.PublishMessage(MessageTypes.AddItemToInventory, new AddItemToInventoryEvent(inventoryItemData));
-            item.PickUp(this);
-        }
+            // MessageBus.PublishMessage(MessageTypes.AddItemToInventory, new AddItemToInventoryEvent(inventoryItemData));
 
+            bool itemPickedUp = false;
+            switch (inventoryData.UniqueType)
+            {
+                case UniqueType.Item:
+                    if (SLocator.GetSlGlobal.TryGet(out IInventoryService<So_InventoryItemData, ItemSlotData> playerItemInventoryService))
+                    {
+                        if (inventoryData is So_InventoryItemData itemData)
+                        {
+                            if (playerItemInventoryService.TryAddItem(itemData))
+                            {
+                                item.PickUp(this);
+                                itemPickedUp = true;
+                            }
+                        }
+                    }
+                    else
+                    {
+                        Debug.LogWarning($"No inventory service found for items when picking up {item.GetItemName()} of type {inventoryData.UniqueType}.", item.GetObject());
+                    }
+                    break;
+                case UniqueType.Magic:
+                    if (SLocator.GetSlGlobal.TryGet(out IInventoryService<So_InventoryMagicData, MagicSlotData> playerMagicInventoryService))
+                    {
+                        if (inventoryData is So_InventoryMagicData magicData)
+                        {
+                            if (playerMagicInventoryService.TryAddItem(magicData))
+                            {
+                                item.PickUp(this);
+                                itemPickedUp = true;
+                            }
+                        }
+                    }
+                    else
+                    {
+                        Debug.LogWarning($"No inventory service found for items when picking up {item.GetItemName()} of type {inventoryData.UniqueType}.", item.GetObject());
+                    }
+                    break;
+                case UniqueType.Spell:
+                    if (SLocator.GetSlGlobal.TryGet(out IInventoryService<So_InventorySpellData, SpellSlotData> playerSpellInventoryService))
+                    {
+                        if (inventoryData is So_InventorySpellData spellData)
+                        {
+                            if (playerSpellInventoryService.TryAddItem(spellData))
+                            {
+                                item.PickUp(this);
+                                itemPickedUp = true;
+                            }
+                        }
+                    }
+                    else
+                    {
+                        Debug.LogWarning($"No inventory service found for items when picking up {item.GetItemName()} of type {inventoryData.UniqueType}.", item.GetObject());
+                    }
+                    break;
+            }
+
+            if (!itemPickedUp)
+            {
+                Debug.LogWarning($"Failed to pick item {item.GetItemName()} to inventory.", item.GetObject()); 
+            }
+            else
+            {
+                pickableItems.Remove(item);
+            }
+        }
+        
         #endregion Private_Methods
     }
 }

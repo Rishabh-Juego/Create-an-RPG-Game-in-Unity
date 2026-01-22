@@ -29,7 +29,7 @@ namespace TGL.RPG.Navigation.PTM
 
         private void Update()
         {
-            if (Input.GetMouseButtonDown(0)) // TODO: Replace with input system
+            if (UnityEngine.InputSystem.Mouse.current.leftButton.wasPressedThisFrame) 
             {
                 if (uiInteraction == null)
                 {

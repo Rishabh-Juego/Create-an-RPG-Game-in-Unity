@@ -5,7 +5,7 @@ using UnityEngine;
 namespace TGL.RPG.Data.Character
 {
     [CreateAssetMenu(fileName = "AvailableCharacters", menuName = "Scriptable Objects/AvailableCharacters")]
-    public class AvailableCharacters : ScriptableObject
+    public class So_AvailableCharacters : ScriptableObject
     {
         public List<So_CharacterInfo> characters;
         

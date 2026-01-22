@@ -8,8 +8,7 @@ namespace TGL.RPG.CommunicationBus
         ActivateSingleScene = 3,
         PlayerMove = 4,
         CursorOverUI = 5,
-        AddItemToInventory = 6,
-        AddItemsToInventory = 7, // if we want to pick multiple items at once in the future.
+        
         
     }
 }

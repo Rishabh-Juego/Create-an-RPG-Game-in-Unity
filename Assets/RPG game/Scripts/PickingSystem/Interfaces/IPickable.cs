@@ -1,3 +1,4 @@
+using TGL.RPG.IdentityRegistry;
 using UnityEngine;
 
 namespace TGL.RPG.Items.PickingSystem
@@ -8,6 +9,6 @@ namespace TGL.RPG.Items.PickingSystem
         string GetItemName();
         GameObject GetObject();
         Vector3 GetObjectPosition();
-        UniqueScriptable GetObjectData();
+        So_UniqueScriptable GetObjectData();
     }
 }

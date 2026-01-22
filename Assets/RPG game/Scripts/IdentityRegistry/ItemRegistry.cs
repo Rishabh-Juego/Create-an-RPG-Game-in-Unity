@@ -9,14 +9,14 @@ namespace TGL.RPG.IdentityRegistry
         /// </summary>
         /// <param name="item">the interface that has all data that makes an object unique</param>
         /// <returns>status if the passed data is duplicate</returns>
-        public static bool CheckIsDuplicate(UniqueScriptable item)
+        public static bool CheckIsDuplicate(So_UniqueScriptable item)
         {
             if (string.IsNullOrEmpty(item.UniqueID)) return true;
 
             // Find all ItemData assets in the project
-            UniqueScriptable[] allItems = Resources.FindObjectsOfTypeAll<UniqueScriptable>();
+            So_UniqueScriptable[] allItems = Resources.FindObjectsOfTypeAll<So_UniqueScriptable>();
 
-            foreach (UniqueScriptable otherItem in allItems)
+            foreach (So_UniqueScriptable otherItem in allItems)
             {
                 // Don't compare the item to itself
                 if (ReferenceEquals(otherItem, item)) continue;

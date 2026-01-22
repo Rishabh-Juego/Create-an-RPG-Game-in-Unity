@@ -8,7 +8,6 @@ using TGL.RPG.Data.Character;
 using TGL.ServiceLocator;
 using TMPro;
 using UnityEngine;
-using CharacterInfo = TGL.RPG.Data.Character.CharacterInfo;
 
 namespace TGL.RPG.Character
 {
@@ -16,10 +15,10 @@ namespace TGL.RPG.Character
     {
         [SerializeField] private TMP_InputField nameInputField;
         [SerializeField] private Transform characterPosition;
-        [SerializeField] private AvailableCharacters allCharacters;
+        [SerializeField] private So_AvailableCharacters allCharacters;
         private GameObject currentCharacter;
         
-        private List<CharacterInfo> allAvailableCharacters;
+        private List<So_CharacterInfo> allAvailableCharacters;
         private int currentCharacterIndex;
         private string playerName;
 
@@ -77,9 +76,9 @@ namespace TGL.RPG.Character
             }
             
             // if we have an old registration, unregister it first
-            if (SLocator.GetSlGlobal.HasService<ISelectedCharacter>())
+            if (SLocator.GetSlGlobal?.HasService<ISelectedCharacter>() ?? false)
             {
-                SLocator.GetSlGlobal.UnRegister(typeof(ISelectedCharacter));
+                SLocator.GetSlGlobal?.UnRegister(typeof(ISelectedCharacter));
             }
             
             // TODO: Service Locator registration is tightly coupled here for simplicity. In a production scenario, consider using a more decoupled approach.
@@ -94,7 +93,7 @@ namespace TGL.RPG.Character
             if (allCharacters == null)
             {
                 // load from scriptable object path
-                allCharacters = Resources.Load<AvailableCharacters>(GameConstants.ScriptableConstants.gameCharactersPath);
+                allCharacters = Resources.Load<So_AvailableCharacters>(GameConstants.ScriptableConstants.gameCharactersPath);
                 if (allCharacters == null)
                 {
                     Debug.LogError("Failed to load AvailableCharacters ScriptableObject from Resources!");

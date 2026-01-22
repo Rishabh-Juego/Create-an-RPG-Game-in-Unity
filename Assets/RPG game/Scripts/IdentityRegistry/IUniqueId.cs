@@ -1,7 +1,10 @@
 using UnityEngine;
 
-public interface IUniqueId
+namespace TGL.RPG.IdentityRegistry
 {
-    public string UniqueID { get; }
-    public UniqueType UniqueType { get; }
+    public interface IUniqueId
+    {
+        public string UniqueID { get; }
+        public UniqueType UniqueType { get; }
+    }
 }
