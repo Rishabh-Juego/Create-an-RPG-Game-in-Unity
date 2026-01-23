@@ -24,7 +24,7 @@ namespace TGL.RPG.Items.InventorySystem.Samples
             _slotData = slotData;
             itemCount = 0;
             countText.text = itemCount.ToString("00");
-            _slotData.OnSlotChanged += UpdateReferences;
+            _slotData.OnSlotDataChanged += UpdateReferences;
             UpdateUI();
         }
         
@@ -32,7 +32,7 @@ namespace TGL.RPG.Items.InventorySystem.Samples
         {
             if (_slotData != null)
             {
-                _slotData.OnSlotChanged -= UpdateReferences;
+                _slotData.OnSlotDataChanged -= UpdateReferences;
             }
         }
 

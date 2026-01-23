@@ -1,5 +1,6 @@
 using TGL.RPG.IdentityRegistry;
 using TGL.RPG.Items.InventorySystem.Data;
+using TGL.RPG.Items.InventorySystem.Samples;
 
 namespace TGL.RPG.CommandPattern.Samples
 {
@@ -8,6 +9,7 @@ namespace TGL.RPG.CommandPattern.Samples
     /// </summary>
     public abstract record InventoryCommandDataBase
     {
-        public UniqueType InventoryType { get; set; } // Mutable property
+        public UniqueType UniqueType = UniqueType.Inventory;
+        public InventoryType InventoryType { get; set; } // Mutable property
     }
 }

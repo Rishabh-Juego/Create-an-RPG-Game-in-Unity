@@ -8,7 +8,7 @@ using UnityEngine;
 namespace TGL.RPG.Items.InventorySystem.Samples
 {
     /// <summary>
-    /// Small SubSection of main <see cref="PlayerInventoryHandler"/> to show inventory data for the player within <see cref="UniqueType.Magic"/> type.
+    /// Small SubSection of main <see cref="PlayerInventoryHandler"/> to show inventory data for the player within <see cref="InventoryType.Magic"/> type.
     /// </summary>
     public class PlayerInventoryMagicUI : PlayerInventoryUI<MagicPlayerInventoryService , So_InventoryMagicData, MagicSlotData, PlayerSlotMagicUI>
     {
@@ -18,7 +18,7 @@ namespace TGL.RPG.Items.InventorySystem.Samples
         public override MagicPlayerInventoryService Setup(So_InventoryMagicData defaultOrNullItem)
         {
             _inventoryService = new MagicPlayerInventoryService();
-            Initialize(UniqueType.Magic, defaultOrNullItem);
+            Initialize(InventoryType.Magic, defaultOrNullItem);
             return _inventoryService;
         }
     }

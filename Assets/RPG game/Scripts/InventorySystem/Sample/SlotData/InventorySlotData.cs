@@ -12,7 +12,7 @@ namespace TGL.RPG.Items.InventorySystem
         protected int slotIndex;
         protected T defaultItemData; 
         
-        public event Action<IInventorySlotData<T>, int> OnSlotChanged;
+        public event Action<IInventorySlotData<T>, int> OnSlotDataChanged;
         
         public T ContainedItemData => itemData;
         public int ItemCount => itemCount;
@@ -25,17 +25,27 @@ namespace TGL.RPG.Items.InventorySystem
             ClearSlot();
         }
         
-        public void UpdateSlot(T scriptableItem, int countOfItems)
+        public bool UpdateSlot(T scriptableItem, int countOfItems)
         {
+            if (!IsValidItemData(scriptableItem))
+            {
+                return false;
+            }
             itemData = scriptableItem;
             itemCount = countOfItems;
-            OnSlotChanged?.Invoke(this, countOfItems);
+            OnSlotDataChanged?.Invoke(this, countOfItems);
+            return true;
         }
 
         public void ClearSlot()
         {
             itemData = defaultItemData;
             itemCount = 0;
+        }
+
+        protected virtual bool IsValidItemData(T itemData)
+        {
+            return defaultItemData.InventoryType == itemData.InventoryType;
         }
     }
 }

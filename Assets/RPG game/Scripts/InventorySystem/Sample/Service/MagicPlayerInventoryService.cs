@@ -7,6 +7,6 @@ namespace TGL.RPG.Items.InventorySystem.Samples
 {
     public class MagicPlayerInventoryService : InventoryPlayerService<So_InventoryMagicData, MagicSlotData> 
     {
-        public override UniqueType InventoryType => UniqueType.Magic;
+        public override InventoryType InventoryType => InventoryType.Magic;
     }
 }

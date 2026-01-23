@@ -8,7 +8,7 @@ using UnityEngine;
 namespace TGL.RPG.Items.InventorySystem.Samples
 {
     /// <summary>
-    /// Small SubSection of main <see cref="PlayerInventoryHandler"/> to show inventory data for the player within <see cref="UniqueType.Spell"/> type.
+    /// Small SubSection of main <see cref="PlayerInventoryHandler"/> to show inventory data for the player within <see cref="InventoryType.Spell"/> type.
     /// </summary>
     public class PlayerInventorySpellUI : PlayerInventoryUI<SpellPlayerInventoryService, So_InventorySpellData, SpellSlotData, PlayerSlotSpellUI>  
     {
@@ -18,7 +18,7 @@ namespace TGL.RPG.Items.InventorySystem.Samples
         public override SpellPlayerInventoryService Setup(So_InventorySpellData defaultOrNullItem)
         {
             _inventoryService = new SpellPlayerInventoryService();
-            Initialize(UniqueType.Spell, defaultOrNullItem);
+            Initialize(InventoryType.Spells, defaultOrNullItem);
             return _inventoryService;
         }
     }

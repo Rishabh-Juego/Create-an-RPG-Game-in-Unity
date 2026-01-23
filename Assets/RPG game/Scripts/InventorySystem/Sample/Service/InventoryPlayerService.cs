@@ -23,7 +23,8 @@ namespace TGL.RPG.Items.InventorySystem.Samples
         protected bool _initialized;
 
         public event Action OnInventoryChanged;
-        public abstract UniqueType InventoryType { get; }
+        public UniqueType UniqueType => UniqueType.Inventory;
+        public abstract InventoryType InventoryType { get; }
 
         public T[] GetAllItems() => slotItems;
         public SO_U DefaultOrNullItem => _defaultOrNullItem;
@@ -112,9 +113,16 @@ namespace TGL.RPG.Items.InventorySystem.Samples
                 // we found a slot with the same item, we can add it here, keeping empty slots for other items
                 if (sameItemSlot.ItemCount < sameItemSlot.ContainedItemData.maxStackCount)
                 {
-                    sameItemSlot.UpdateSlot(sameItemSlot.ContainedItemData, sameItemSlot.ItemCount + 1);
-                    OnInventoryChanged?.Invoke();
-                    return true;
+                    if (sameItemSlot.UpdateSlot(sameItemSlot.ContainedItemData, sameItemSlot.ItemCount + 1))
+                    {
+                        OnInventoryChanged?.Invoke();
+                        return true;
+                    }
+                    else
+                    {
+                        Debug.LogError($"We were expecting to be able to add item {item.name} to inventory of type {InventoryType} but something went wrong.", item);
+                        return false;
+                    }
                 }
                 // else continue to look for other slots with the same item
             }
@@ -123,9 +131,16 @@ namespace TGL.RPG.Items.InventorySystem.Samples
             T emptySlot = slotItems.FirstOrDefault(x => x.ContainedItemData == _defaultOrNullItem);
             if (emptySlot != null)
             {
-                emptySlot.UpdateSlot(item, 1);
-                OnInventoryChanged?.Invoke();
-                return true;
+                if (emptySlot.UpdateSlot(item, 1))
+                {
+                    OnInventoryChanged?.Invoke();
+                    return true;
+                }
+                else
+                {
+                    Debug.LogError($"We were expecting to be able to add item {item.name} to inventory of type {InventoryType} but something went wrong.", item);
+                    return false;
+                }
             }
 
             return false;
@@ -165,16 +180,30 @@ namespace TGL.RPG.Items.InventorySystem.Samples
                 if (itemsLeftToAdd <= spaceInThisSlot)
                 {
                     // we can add all remaining items in this slot
-                    sameItemSlot.UpdateSlot(sameItemSlot.ContainedItemData, sameItemSlot.ItemCount + itemsLeftToAdd);
-                    OnInventoryChanged?.Invoke();
-                    AggregateInventorySlotsForItem(item);
-                    return true;
+                    if (sameItemSlot.UpdateSlot(sameItemSlot.ContainedItemData, sameItemSlot.ItemCount + itemsLeftToAdd))
+                    {
+                        OnInventoryChanged?.Invoke();
+                        AggregateInventorySlotsForItem(item);
+                        return true;
+                    }
+                    else
+                    {
+                        Debug.LogError($"We were expecting to be able to add item {item.name} to inventory of type {InventoryType} but something went wrong.", item);
+                        return false;
+                    }
                 }
                 else
                 {
                     // fill this slot and continue to next
-                    sameItemSlot.UpdateSlot(sameItemSlot.ContainedItemData, sameItemSlot.ContainedItemData.maxStackCount);
-                    itemsLeftToAdd -= spaceInThisSlot;
+                    if (sameItemSlot.UpdateSlot(sameItemSlot.ContainedItemData, sameItemSlot.ContainedItemData.maxStackCount))
+                    {
+                        itemsLeftToAdd -= spaceInThisSlot;
+                    }
+                    else
+                    {
+                        Debug.LogError($"We were expecting to be able to add item {item.name} to inventory of type {InventoryType} but something went wrong.", item);
+                        return false;
+                    }
                 }
             }
 
@@ -186,16 +215,30 @@ namespace TGL.RPG.Items.InventorySystem.Samples
                     if (itemsLeftToAdd <= item.maxStackCount)
                     {
                         // we can add all remaining items in this slot
-                        emptySlot.UpdateSlot(item, itemsLeftToAdd);
-                        OnInventoryChanged?.Invoke();
-                        AggregateInventorySlotsForItem(item);
-                        return true;
-                        // loop stops at return, so break is not needed
+                        if (emptySlot.UpdateSlot(item, itemsLeftToAdd))
+                        {
+                            OnInventoryChanged?.Invoke();
+                            AggregateInventorySlotsForItem(item);
+                            return true;
+                            // loop stops at return, so break is not needed
+                        }
+                        else
+                        {
+                            Debug.LogError($"We were expecting to be able to add item {item.name} to inventory of type {InventoryType} but something went wrong.", item);
+                            return false;
+                        }
                     }
                     else
                     {
-                        emptySlot.UpdateSlot(emptySlot.ContainedItemData, item.maxStackCount);
-                        itemsLeftToAdd -= item.maxStackCount;
+                        if (emptySlot.UpdateSlot(emptySlot.ContainedItemData, item.maxStackCount))
+                        {
+                            itemsLeftToAdd -= item.maxStackCount;
+                        }
+                        else
+                        {
+                            Debug.LogError($"We were expecting to be able to add item {item.name} to inventory of type {InventoryType} but something went wrong.", item);
+                            return false;
+                        }
                     }
                 }
             }
@@ -238,7 +281,11 @@ namespace TGL.RPG.Items.InventorySystem.Samples
                     }
                     else
                     {
-                        sameItemSlot.UpdateSlot(sameItemSlot.ContainedItemData, sameItemSlotsCount - 1);
+                        if (!sameItemSlot.UpdateSlot(sameItemSlot.ContainedItemData, sameItemSlotsCount - 1))
+                        {
+                            Debug.LogError($"We were expecting to be able to add item {item.name} to inventory of type {InventoryType} but something went wrong.", item);
+                            return false;
+                        }
                     }
 
                     AggregateInventorySlotsForItem(item);
@@ -288,8 +335,15 @@ namespace TGL.RPG.Items.InventorySystem.Samples
             for (int i = 0; i < slotsNeeded; i++)
             {
                 itemsToAddInThisSlot = Math.Min(item.maxStackCount, totalItemCount - itemsAdded);
-                sameItemSlots[i].UpdateSlot(item, itemsToAddInThisSlot);
-                itemsAdded += itemsToAddInThisSlot;
+                if (sameItemSlots[i].UpdateSlot(item, itemsToAddInThisSlot))
+                {
+                    itemsAdded += itemsToAddInThisSlot;
+                }
+                else
+                {
+                    Debug.LogError($"We were expecting to be able to add item {item.name} to inventory of type {InventoryType} but something went wrong.", item);
+                    return;
+                }
             }
         }
 

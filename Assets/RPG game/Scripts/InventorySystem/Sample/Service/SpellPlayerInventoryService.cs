@@ -7,6 +7,6 @@ namespace TGL.RPG.Items.InventorySystem.Samples
 {
     public class SpellPlayerInventoryService : InventoryPlayerService<So_InventorySpellData, SpellSlotData> 
     {
-        public override UniqueType InventoryType => UniqueType.Spell;
+        public override InventoryType InventoryType => InventoryType.Spells;
     }
 }

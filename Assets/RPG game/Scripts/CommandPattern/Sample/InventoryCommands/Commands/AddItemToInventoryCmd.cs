@@ -2,6 +2,7 @@ using System;
 using TGL.RPG.IdentityRegistry;
 using TGL.RPG.Items.InventorySystem;
 using TGL.RPG.Items.InventorySystem.Data;
+using TGL.RPG.Items.InventorySystem.Samples;
 using TGL.ServiceLocator;
 using UnityEngine;
 
@@ -22,7 +23,7 @@ namespace TGL.RPG.CommandPattern.Samples
         {
             Data = new AddItemToInventoryDto
             {
-                InventoryType = inventoryDataSO.UniqueType,
+                InventoryType = inventoryDataSO.InventoryType,
                 inventoryData = inventoryDataSO,
                 ItemCount = addCount
             };
@@ -35,7 +36,7 @@ namespace TGL.RPG.CommandPattern.Samples
             
             switch (Data.InventoryType)
             {
-                case UniqueType.Item:
+                case InventoryType.Items:
                     if (SLocator.GetSlGlobal.TryGet(out IInventoryService<So_InventoryItemData, ItemSlotData> playerItemInventoryService))
                     {
                         if (Data.inventoryData is So_InventoryItemData itemData)
@@ -51,7 +52,7 @@ namespace TGL.RPG.CommandPattern.Samples
                         Debug.LogWarning($"No inventory service found for items when picking up {Data.inventoryData.DisplayName} of type {Data.InventoryType}.", Data.inventoryData.objectPrefab);
                     }
                     break;
-                case UniqueType.Magic:
+                case InventoryType.Magic:
                     if (SLocator.GetSlGlobal.TryGet(out IInventoryService<So_InventoryMagicData, MagicSlotData> playerMagicInventoryService))
                     {
                         if (Data.inventoryData is So_InventoryMagicData magicData)
@@ -67,7 +68,7 @@ namespace TGL.RPG.CommandPattern.Samples
                         Debug.LogWarning($"No inventory service found for items when picking up {Data.inventoryData.DisplayName} of type {Data.InventoryType}.", Data.inventoryData.objectPrefab);
                     }
                     break;
-                case UniqueType.Spell:
+                case InventoryType.Spells:
                     if (SLocator.GetSlGlobal.TryGet(out IInventoryService<So_InventorySpellData, SpellSlotData> playerSpellInventoryService))
                     {
                         if (Data.inventoryData is So_InventorySpellData spellData)

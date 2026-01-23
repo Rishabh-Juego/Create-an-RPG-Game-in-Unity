@@ -1,13 +1,15 @@
 using System;
 using TGL.RPG.IdentityRegistry;
 using TGL.RPG.Items.InventorySystem.Data;
+using TGL.RPG.Items.InventorySystem.Samples;
 using UnityEngine;
 
 namespace TGL.RPG.Items.InventorySystem
 {
     public interface IInventoryService<SO_T, U> where SO_T : So_InventoryData where U : IInventorySlotData<SO_T>
     {
-        UniqueType InventoryType { get; }
+        UniqueType UniqueType => UniqueType.Inventory;
+        InventoryType InventoryType { get; }
         event Action OnInventoryChanged;
         void Initialize(int slotSize, SO_T defaultOrNullItem);
         U[] GetAllItems();

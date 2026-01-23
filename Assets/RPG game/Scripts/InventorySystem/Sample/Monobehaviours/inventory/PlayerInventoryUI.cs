@@ -12,11 +12,11 @@ namespace TGL.RPG.Items.InventorySystem.Samples
         protected T _inventoryService;
         protected abstract List<V> AllSlotsUI { get; }
         protected SO_T _defaultOrNullItem;
-        protected UniqueType _inventoryType;
+        protected InventoryType _inventoryType;
         
         public abstract T Setup(SO_T defaultOrNullItem);
         
-        protected void Initialize(UniqueType inventoryType, SO_T defaultOrNullItem)
+        protected void Initialize(InventoryType inventoryType, SO_T defaultOrNullItem)
         {
             _inventoryType = inventoryType;
             _defaultOrNullItem = defaultOrNullItem;

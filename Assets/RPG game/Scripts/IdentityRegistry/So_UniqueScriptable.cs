@@ -1,4 +1,5 @@
 using UnityEngine;
+using UnityEngine.Serialization;
 
 namespace TGL.RPG.IdentityRegistry
 {
@@ -6,10 +7,10 @@ namespace TGL.RPG.IdentityRegistry
     {
         [Space(10), Header("Implement UniqueId"), Space(5)]
         protected string id;
-        [SerializeField] protected UniqueType itemType = UniqueType.Undefined;
+        [FormerlySerializedAs("itemType")] [SerializeField] protected UniqueType uniqueType = UniqueType.Undefined;
 
 
         public string UniqueID => id;
-        public UniqueType UniqueType => itemType;
+        public virtual UniqueType UniqueType => uniqueType;
     }
 }
