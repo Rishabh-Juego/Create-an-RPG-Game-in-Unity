@@ -12,9 +12,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 713ca4dffe466488e8c822ee1057ea9f, type: 3}
   m_Name: RedMushroom
   m_EditorClassIdentifier: 
-  itemName: Item_Red_Mushroom_01
-  itemType: 2
+  uniqueType: 5
   DisplayName: Red Mushroom
   objectIcon: {fileID: 21300000, guid: 93a09802d10bd4ae5a47eea7c24444fa, type: 3}
   objectPrefab: {fileID: 163506, guid: 20a21dd3c983a2940bcafe4182bcaceb, type: 3}
   maxStackCount: 3
+  inventoryType: 1

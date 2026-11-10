@@ -12,9 +12,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 713ca4dffe466488e8c822ee1057ea9f, type: 3}
   m_Name: Flower_06
   m_EditorClassIdentifier: 
-  itemName: Item_Flower_06
-  itemType: 2
+  uniqueType: 5
   DisplayName: Flower 06
   objectIcon: {fileID: 21300000, guid: 89c1e673432f7449b94f7f9398f99059, type: 3}
   objectPrefab: {fileID: 172516, guid: 9a7f994f4f1aeaa48aba13a523159ac7, type: 3}
   maxStackCount: 3
+  inventoryType: 1

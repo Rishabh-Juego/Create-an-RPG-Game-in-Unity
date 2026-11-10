@@ -1,23 +1,39 @@
 using System;
 using TGL.RPG.IdentityRegistry;
 using TGL.RPG.Items.InventorySystem.Data;
+using TGL.RPG.Items.InventorySystem.Samples;
 using UnityEngine;
 
 namespace TGL.RPG.Items.InventorySystem
 {
-    public interface IInventorySlotData<SO_T> where SO_T : So_InventoryData
+    public interface IInventorySlotData
     {
-        event Action<IInventorySlotData<SO_T>, int> OnSlotDataChanged;
+        // From ScriptableObject
+        string ItemId { get; }
+        public UniqueType UniqueType => UniqueType.Inventory;
+        public InventoryType InventoryType { get; }
+        public So_InventoryData EmptyItemSo { get; }
+        string DisplayName { get; }
+        int MaxStackCount { get; }
+        bool HasData { get; }
+        bool IsStackable { get; }
+        bool IsEmpty { get; }
+        bool IsFull { get; }
         
-        SO_T ContainedItemData { get; }
-        
-        int ItemCount { get; }
+        // From Inventory Slot Data
+        int CurrentStackCount { get; }
         int SlotIndex { get; }
-        // int MaxStackSize { get; }
-        // string ItemId { get; }
-
-        void Initialize(int index, SO_T defaultItem);
-        bool UpdateSlot(SO_T itemData, int count);
+        
+        // Events
+        event Action<IInventorySlotData, int> OnSlotDataChanged;
+        
+        // generic methods
+        void Initialize(int index, So_InventoryData defaultScriptableItem);
+        bool SetSlotData(So_InventoryData itemData, int count);
+        bool UpdateSlotData(So_InventoryData itemData, int count);
         void ClearSlot();
+        
+        // functional methods
+        bool HasItem(So_InventoryData itemData);
     }
 }

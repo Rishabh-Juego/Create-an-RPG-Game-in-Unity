@@ -1,9 +1,17 @@
 using System;
 using TGL.RPG.IdentityRegistry;
 using TGL.RPG.Items.InventorySystem.Data;
+using TGL.RPG.Items.InventorySystem.Samples;
 using UnityEngine;
 
 namespace TGL.RPG.Items.InventorySystem
 {
-    public class ItemSlotData : InventorySlotData<So_InventoryItemData> { }
+    [Serializable]
+    public class ItemSlotData : InventorySlotData
+    {
+        public ItemSlotData()
+        {
+            inventoryType = InventoryType.Items;
+        }
+    }
 }

@@ -7,84 +7,133 @@ using UnityEngine;
 
 namespace TGL.RPG.Items.InventorySystem.Samples
 {
-    public abstract class InventoryPlayerService<SO_U, T> : IInventoryService<SO_U, T> where SO_U : So_InventoryData where T : InventorySlotData<SO_U>
+    public abstract class InventoryPlayerService : IInventoryService
     {
-        /// <summary>
-        ///  Number of slots in the inventory
-        /// </summary>
-        protected int slotCount;
-        
-        /// <summary>
-        /// Data of items in the inventory slots
-        /// </summary>
-        protected T[] slotItems;
-
-        protected SO_U _defaultOrNullItem;
+        #region Variables
+        protected IInventoryGridData gridData;
+        protected So_InventoryData _defaultOrNullItemSo;
+        protected List<So_InventoryData> _allInventoryItemsSo;
+        protected Dictionary<string, So_InventoryData> inventoryItemsDict = new Dictionary<string, So_InventoryData>();
         protected bool _initialized;
-
-        public event Action OnInventoryChanged;
-        public UniqueType UniqueType => UniqueType.Inventory;
-        public abstract InventoryType InventoryType { get; }
-
-        public T[] GetAllItems() => slotItems;
-        public SO_U DefaultOrNullItem => _defaultOrNullItem;
+        #endregion  Variables
         
-        public void Initialize(int slotSize, SO_U defaultOrNullItem)
-        {
-            slotCount = slotSize;
-            _defaultOrNullItem = defaultOrNullItem;
-            slotItems = new T[slotCount];
-            for(int i = 0; i < slotCount; i++)
-            {
-                T slotItem = Activator.CreateInstance<T>(); // because U is constrained to InventorySlotData<T> which is abstract
-                slotItem.Initialize(i, defaultOrNullItem);
-                slotItems[i] = slotItem;
-            }
+        #region Properties
+        public IInventoryGridData InventoryData => gridData;
+        public So_InventoryData DefaultOrNullItemSo => _defaultOrNullItemSo;
+        public So_InventoryData[] AllInventoryItemsSo => _allInventoryItemsSo.ToArray();
+        public Dictionary<string, So_InventoryData> AllInventoryItemsDict => inventoryItemsDict;
+        public event Action<IInventoryGridData> OnInventoryDataChanged;
+        #endregion Properties
 
+        #region GenericMethods
+        public void Initialize(IInventoryGridData gridObj, int slotSize, So_InventoryData defaultOrNullItem)
+        {
+            gridData = gridObj; // gridData = Activator.CreateInstance<IInventoryGridData>();
+            _defaultOrNullItemSo = defaultOrNullItem;
+            _allInventoryItemsSo = new List<So_InventoryData>();
+            inventoryItemsDict = new Dictionary<string, So_InventoryData>();
+            
+            gridData.InitializeData(slotSize, defaultOrNullItem);
             _initialized = true;
         }
 
-        /// <summary>
-        /// Can we add item to the inventory in any slot?  <br/>
-        /// for actions like picking up from ground, where the inventory is not visible so any slot can be used
-        /// </summary>
-        /// <param name="item">The item we want to know can be added</param>
-        /// <returns>bool stating item can be added</returns>
-        public bool CanAddItem(SO_U item)
+        public void ClearInventory()
         {
             if (!_initialized)
             {
-                Debug.LogError($"Cannot check CanAddItem for uninitialized inventory of type {InventoryType}.");
+                return;
+            }
+            
+            gridData.ClearInventory();
+            _allInventoryItemsSo.Clear();
+            inventoryItemsDict.Clear();
+            OnInventoryDataChanged?.Invoke(InventoryData);
+        }
+        
+        public IInventorySlotData[] GetAllItemData();
+        #endregion GenericMethods
+        
+        #region functionalMethods
+        public bool CanAddItem(So_InventoryData item)
+        {
+            if (!_initialized)
+            {
+                Debug.LogError($"Cannot check CanAddItem for uninitialized inventory of type {item.InventoryType}.");
                 return false;
             }
 
-            if (_defaultOrNullItem == item)
+            if (_defaultOrNullItemSo == item)
             {
-                Debug.LogError($"Cannot add default item to inventory of type {InventoryType}.");
+                Debug.LogError($"Cannot add default item to inventory of type {item.InventoryType}.");
                 return false;
             }
-            
-            // if we have at least one empty slot, we can add the item
-            if (slotItems.Any(x => x.ContainedItemData == _defaultOrNullItem))
+
+            // if we have at least one empty slot, we can add the item as the count is 1
+            if (gridData.HasEmptySlot())
             {
                 return true;
             }
             
             // if no empty slots, we check if the same item is available and can be stacked
-            IEnumerable<T> sameItemSlots = slotItems.Where(x => x.ContainedItemData == item);
-            foreach (T sameItemSlot in sameItemSlots)
+            if (gridData.CanStackItemInAnySlot(item, 1))
             {
-                // we found a slot with the same item, we can add it here, keeping empty slots for other items
-                if (sameItemSlot.ItemCount < sameItemSlot.ContainedItemData.maxStackCount)
-                {
-                    return true;
-                }
-                // else continue to look for other slots with the same item
+                return true;
             }
             
             // if we cannot stack or no empty slots, we cannot add the item
             return false;
         }
+
+        public bool CanAddItems(So_InventoryData item, int count)
+        {
+            if (!_initialized)
+            {
+                Debug.LogError($"Cannot check CanAddItem for uninitialized inventory of type {item.InventoryType}.");
+                return false;
+            }
+
+            if (_defaultOrNullItemSo == item)
+            {
+                Debug.LogError($"Cannot add default item to inventory of type {item.InventoryType}.");
+                return false;
+            }
+            
+            // we check if the same item is available and can be stacked in all available slots
+            if (gridData.CanStackItemInExistingSlots(item, count))
+            {
+                return true;
+            }
+            
+            // if we cannot stack in existing slots, we check if we can add items in existing as well as empty slots together
+            if (gridData.CanAddItemsWithinAvailableSlots(item, count))
+            {
+                return true;
+            }
+            
+            // if we cannot add the items, return false
+            return false;
+        }
+
+        public bool TryAddItem(So_InventoryData item)
+        {
+            if (!CanAddItem(item))
+            {
+                return false;
+            }
+            gridData.AddItem(item);
+            return true;
+        }
+        public bool TryAddItems(So_InventoryData item, int count);
+        public bool TryRemoveItem(So_InventoryData item);
+        public bool TryRemoveItems(So_InventoryData item, int count); 
+        #endregion functionalMethods
+        
+        /*-------*-------*-------*-------*-------*-------*-------*-------*-------*/
+        /*-------*-------*-------*-------*       *-------*-------*-------*-------*/
+        /*-------*-------*-------*-------*-------*-------*-------*-------*-------*/
+        
+        
+        
 
         /// <summary>
         /// Try to add item anywhere, for actions like picking up from ground, <br/>
@@ -111,9 +160,9 @@ namespace TGL.RPG.Items.InventorySystem.Samples
             foreach (T sameItemSlot in sameItemSlots)
             {
                 // we found a slot with the same item, we can add it here, keeping empty slots for other items
-                if (sameItemSlot.ItemCount < sameItemSlot.ContainedItemData.maxStackCount)
+                if (sameItemSlot.CurrentStackCount < sameItemSlot.ContainedItemData.maxStackCount)
                 {
-                    if (sameItemSlot.UpdateSlot(sameItemSlot.ContainedItemData, sameItemSlot.ItemCount + 1))
+                    if (sameItemSlot.UpdateSlotData(sameItemSlot.ContainedItemData, sameItemSlot.CurrentStackCount + 1))
                     {
                         OnInventoryChanged?.Invoke();
                         return true;
@@ -131,7 +180,7 @@ namespace TGL.RPG.Items.InventorySystem.Samples
             T emptySlot = slotItems.FirstOrDefault(x => x.ContainedItemData == _defaultOrNullItem);
             if (emptySlot != null)
             {
-                if (emptySlot.UpdateSlot(item, 1))
+                if (emptySlot.UpdateSlotData(item, 1))
                 {
                     OnInventoryChanged?.Invoke();
                     return true;
@@ -162,7 +211,7 @@ namespace TGL.RPG.Items.InventorySystem.Samples
             
             int emptySlotCount = slotItems.Count(x => x.ContainedItemData == _defaultOrNullItem);
             int sameItemSlotsCount = slotItems.Count(x => x.ContainedItemData == item);
-            int availableItemCountInInventory = slotItems.Where(x => x.ContainedItemData == item).Sum(x => x.ItemCount);
+            int availableItemCountInInventory = slotItems.Where(x => x.ContainedItemData == item).Sum(x => x.CurrentStackCount);
             int availableSpaceInSameItemSlots = sameItemSlotsCount * item.maxStackCount - availableItemCountInInventory;
             int maxCountIfUsingEmptySlots = emptySlotCount * item.maxStackCount;
             int maxInventoryAddCapacity = availableSpaceInSameItemSlots + maxCountIfUsingEmptySlots;
@@ -174,13 +223,13 @@ namespace TGL.RPG.Items.InventorySystem.Samples
 
             int itemsLeftToAdd = itemCount;
             // add in same item slots first
-            foreach (T sameItemSlot in slotItems.Where(x => x.ContainedItemData == item && x.ItemCount < x.ContainedItemData.maxStackCount))
+            foreach (T sameItemSlot in slotItems.Where(x => x.ContainedItemData == item && x.CurrentStackCount < x.ContainedItemData.maxStackCount))
             {
-                int spaceInThisSlot = sameItemSlot.ContainedItemData.maxStackCount - sameItemSlot.ItemCount;
+                int spaceInThisSlot = sameItemSlot.ContainedItemData.maxStackCount - sameItemSlot.CurrentStackCount;
                 if (itemsLeftToAdd <= spaceInThisSlot)
                 {
                     // we can add all remaining items in this slot
-                    if (sameItemSlot.UpdateSlot(sameItemSlot.ContainedItemData, sameItemSlot.ItemCount + itemsLeftToAdd))
+                    if (sameItemSlot.UpdateSlotData(sameItemSlot.ContainedItemData, sameItemSlot.CurrentStackCount + itemsLeftToAdd))
                     {
                         OnInventoryChanged?.Invoke();
                         AggregateInventorySlotsForItem(item);
@@ -195,7 +244,7 @@ namespace TGL.RPG.Items.InventorySystem.Samples
                 else
                 {
                     // fill this slot and continue to next
-                    if (sameItemSlot.UpdateSlot(sameItemSlot.ContainedItemData, sameItemSlot.ContainedItemData.maxStackCount))
+                    if (sameItemSlot.UpdateSlotData(sameItemSlot.ContainedItemData, sameItemSlot.ContainedItemData.maxStackCount))
                     {
                         itemsLeftToAdd -= spaceInThisSlot;
                     }
@@ -215,7 +264,7 @@ namespace TGL.RPG.Items.InventorySystem.Samples
                     if (itemsLeftToAdd <= item.maxStackCount)
                     {
                         // we can add all remaining items in this slot
-                        if (emptySlot.UpdateSlot(item, itemsLeftToAdd))
+                        if (emptySlot.UpdateSlotData(item, itemsLeftToAdd))
                         {
                             OnInventoryChanged?.Invoke();
                             AggregateInventorySlotsForItem(item);
@@ -230,7 +279,7 @@ namespace TGL.RPG.Items.InventorySystem.Samples
                     }
                     else
                     {
-                        if (emptySlot.UpdateSlot(emptySlot.ContainedItemData, item.maxStackCount))
+                        if (emptySlot.UpdateSlotData(emptySlot.ContainedItemData, item.maxStackCount))
                         {
                             itemsLeftToAdd -= item.maxStackCount;
                         }
@@ -271,7 +320,7 @@ namespace TGL.RPG.Items.InventorySystem.Samples
             T sameItemSlot = slotItems.FirstOrDefault(x => x.ContainedItemData == item);
             if (sameItemSlot != null)
             {
-                sameItemSlotsCount = sameItemSlot.ItemCount;
+                sameItemSlotsCount = sameItemSlot.CurrentStackCount;
                 // we found a slot with the same item, we can add it
                 if (sameItemSlotsCount >= 1)
                 {
@@ -281,7 +330,7 @@ namespace TGL.RPG.Items.InventorySystem.Samples
                     }
                     else
                     {
-                        if (!sameItemSlot.UpdateSlot(sameItemSlot.ContainedItemData, sameItemSlotsCount - 1))
+                        if (!sameItemSlot.UpdateSlotData(sameItemSlot.ContainedItemData, sameItemSlotsCount - 1))
                         {
                             Debug.LogError($"We were expecting to be able to add item {item.name} to inventory of type {InventoryType} but something went wrong.", item);
                             return false;
@@ -309,7 +358,7 @@ namespace TGL.RPG.Items.InventorySystem.Samples
         protected void AggregateInventorySlotsForItem(SO_U item)
         {
             List<T> sameItemSlots = slotItems.Where(x => x.ContainedItemData == item).ToList();
-            int totalItemCount = sameItemSlots.Sum(x => x.ItemCount);
+            int totalItemCount = sameItemSlots.Sum(x => x.CurrentStackCount);
             int numberOfSlotsBeingUsed = sameItemSlots.Count();
             
             // calculate how many slots are needed to store all actual items
@@ -335,7 +384,7 @@ namespace TGL.RPG.Items.InventorySystem.Samples
             for (int i = 0; i < slotsNeeded; i++)
             {
                 itemsToAddInThisSlot = Math.Min(item.maxStackCount, totalItemCount - itemsAdded);
-                if (sameItemSlots[i].UpdateSlot(item, itemsToAddInThisSlot))
+                if (sameItemSlots[i].UpdateSlotData(item, itemsToAddInThisSlot))
                 {
                     itemsAdded += itemsToAddInThisSlot;
                 }
@@ -345,18 +394,6 @@ namespace TGL.RPG.Items.InventorySystem.Samples
                     return;
                 }
             }
-        }
-
-        /// <summary>
-        /// clears all items from inventory
-        /// </summary>
-        public void ClearInventory()
-        {
-            for(int i = 0; i < slotCount; i++)
-            {
-                slotItems[i].ClearSlot();
-            }
-            OnInventoryChanged?.Invoke();
         }
     }
 }

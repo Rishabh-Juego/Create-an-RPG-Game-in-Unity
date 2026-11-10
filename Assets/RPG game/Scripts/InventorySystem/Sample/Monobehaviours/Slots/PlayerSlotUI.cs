@@ -41,7 +41,7 @@ namespace TGL.RPG.Items.InventorySystem.Samples
             if (dataRef is T concreteData)
             {
                 _slotData = concreteData;
-                itemCount = dataRef.ItemCount;
+                itemCount = dataRef.CurrentStackCount;
                 itemCount = newCount;
                 UpdateUI();
             }
