@@ -8,7 +8,7 @@ namespace RPG_Game.Items.InventorySystem.Samples
     {
         public MagicInventoryGridUiInfo()
         {
-            inventoryType = InventoryType.Magic;
+            inventorySpecificType = InventoryType.Magic;
         }
     }
 }

@@ -11,7 +11,7 @@ namespace TGL.RPG.Items.InventorySystem
     {
         public SpellSlotUiInfo()
         {
-            inventoryType = InventoryType.Spells;
+	        inventorySpecificType = InventoryType.Spells;
         }
     }
 }

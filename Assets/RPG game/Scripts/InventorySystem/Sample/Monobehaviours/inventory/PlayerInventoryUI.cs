@@ -16,9 +16,9 @@ namespace TGL.RPG.Items.InventorySystem.Samples
         
         public abstract T Setup(SO_T defaultOrNullItem);
         
-        protected void Initialize(InventoryType inventoryType, SO_T defaultOrNullItem)
+        protected void Initialize(InventoryType inventorySpecificType, SO_T defaultOrNullItem)
         {
-            _inventoryType = inventoryType;
+            _inventoryType = inventorySpecificType;
             _defaultOrNullItem = defaultOrNullItem;
             
             _inventoryService.Initialize(AllSlotsUI.Count, defaultOrNullItem);

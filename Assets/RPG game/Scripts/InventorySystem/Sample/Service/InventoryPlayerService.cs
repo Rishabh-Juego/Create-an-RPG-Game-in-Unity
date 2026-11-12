@@ -1,9 +1,8 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using TGL.RPG.IdentityRegistry;
 using TGL.RPG.Items.InventorySystem.Data;
-using UnityEngine;
+// using UnityEngine;
 
 namespace TGL.RPG.Items.InventorySystem.Samples
 {
@@ -12,7 +11,7 @@ namespace TGL.RPG.Items.InventorySystem.Samples
 #region Variables
         protected IInventoryGridUiInfo gridUiInfo;
         protected So_InventoryItem _defaultOrNullItemSo;
-        protected List<So_InventoryItem> _allInventoryItemsSo; // TODO: Need to update the list when we add slots or update slots
+        protected List<So_InventoryItem> _allInventoryItemsSo;
         protected Dictionary<string, So_InventoryItem> inventoryItemsDict = new Dictionary<string, So_InventoryItem>(); // TODO: Need to update the list when we add slots or update slots
         protected bool _initialized;
 #endregion  Variables
@@ -21,15 +20,21 @@ namespace TGL.RPG.Items.InventorySystem.Samples
         public IInventoryGridUiInfo InventoryInfo => gridUiInfo;
         public So_InventoryItem DefaultOrNullItemSo => _defaultOrNullItemSo;
         public So_InventoryItem[] AllInventoryItemsSo => _allInventoryItemsSo.ToArray();
-        public Dictionary<string, So_InventoryItem> AllInventoryItemsDict => inventoryItemsDict;
+        public Dictionary<string, So_InventoryItem> AllInventoryItemsDict => inventoryItemsDict; // TODO: Need to update the list when we add slots or update slots
         public Dictionary<So_InventoryItem, int> AllInventoryItemsCountDict => AllInventoryItemsSo.Distinct().ToDictionary(x => x, x => gridUiInfo.GetTotalItemCount(x));
         public event Action<IInventoryGridUiInfo> OnInventoryDataChanged;
+        public InventoryType InventorySpecificType => InventoryType.Undefined;
 #endregion Properties
 
 #region GenericMethods
         public void Initialize(IInventoryGridUiInfo gridObj, int slotSize, So_InventoryItem defaultOrNullItem)
         {
             gridUiInfo = gridObj; // gridData = Activator.CreateInstance<IInventoryGridData>();
+            if (defaultOrNullItem.InventorySpecificType != InventorySpecificType)
+            {
+	            UnityEngine.Debug.LogError($"Cannot initialize inventory of type {InventorySpecificType} as the default item is of {defaultOrNullItem.InventorySpecificType} Type.");
+	            return;
+            }
             gridUiInfo.InitializeData(slotSize, defaultOrNullItem);
             _defaultOrNullItemSo = defaultOrNullItem;
             _allInventoryItemsSo = new List<So_InventoryItem>();
@@ -74,13 +79,13 @@ namespace TGL.RPG.Items.InventorySystem.Samples
         {
             if (!_initialized)
             {
-                Debug.LogError($"Cannot check CanAddItem for uninitialized inventory of type {item.InventoryType}.");
+	            UnityEngine.Debug.LogError($"Cannot check CanAddItem for uninitialized inventory of type {InventorySpecificType}.");
                 return false;
             }
 
             if (_defaultOrNullItemSo == item)
             {
-                Debug.LogError($"Cannot add default item to inventory of type {item.InventoryType}.");
+	            UnityEngine.Debug.LogError($"Cannot add default item to inventory of type {InventorySpecificType}.");
                 return false;
             }
             
@@ -103,13 +108,13 @@ namespace TGL.RPG.Items.InventorySystem.Samples
         {
             if (!_initialized)
             {
-                Debug.LogError($"Cannot check CanAddItem for uninitialized inventory of type {item.InventoryType}.");
+	            UnityEngine.Debug.LogError($"Cannot check CanAddItem for uninitialized inventory of type {InventorySpecificType}.");
                 return false;
             }
 
             if (_defaultOrNullItemSo == item)
             {
-                Debug.LogError($"Cannot add default item to inventory of type {item.InventoryType}.");
+	            UnityEngine.Debug.LogError($"Cannot add default item to inventory of type {InventorySpecificType}.");
                 return false;
             }
             
@@ -162,260 +167,80 @@ namespace TGL.RPG.Items.InventorySystem.Samples
         {
 	        if (!_initialized)
 	        {
-		        Debug.LogError($"Cannot try to remove item for uninitialized inventory of type {item.InventoryType}.");
+		        UnityEngine.Debug.LogError($"Cannot try to remove item for uninitialized inventory of type {InventorySpecificType}.");
 		        return false;
 	        }
 
 	        if (_defaultOrNullItemSo == item)
 	        {
-		        Debug.LogError($"Cannot remove default item from inventory of type {item.InventoryType}.");
+		        UnityEngine.Debug.LogError($"Cannot remove default item from inventory of type {InventorySpecificType}.");
 		        return false;
 	        }
 
-	        if (gridUiInfo.GetTotalItemCount(item) > 1)
+	        // if the grid does not have a total count higher or equal to quantity, we cannot remove any items
+	        if (gridUiInfo.GetTotalItemCount(item) < 1)
 	        {
 		        return false;
 	        }
-
-	        throw;
+	        
+	        bool removed = gridUiInfo.RemoveItem(item);
+	        if (removed && gridUiInfo.GetTotalItemCount(item) == 0 && _allInventoryItemsSo.Contains(item))
+	        {
+		        _allInventoryItemsSo.Remove(item);
+	        }
+	        return removed;
         }
 
         public bool TryRemoveItems(So_InventoryItem item, int count)
         {
-	        throw;
+	        if (!_initialized)
+	        {
+		        UnityEngine.Debug.LogError($"Cannot try to remove item for uninitialized inventory of type {InventorySpecificType}.");
+		        return false;
+	        }
+
+	        if (_defaultOrNullItemSo == item)
+	        {
+		        UnityEngine.Debug.LogError($"Cannot remove default item from inventory of type {InventorySpecificType}.");
+		        return false;
+	        }
+
+	        // if the grid does not have a total count higher or equal to quantity, we cannot remove any items
+	        if (gridUiInfo.GetTotalItemCount(item) < count)
+	        {
+		        return false;
+	        }
+	        
+	        bool removed = gridUiInfo.RemoveItems(item, count);
+	        if (removed && gridUiInfo.GetTotalItemCount(item) == 0 && _allInventoryItemsSo.Contains(item))
+	        {
+		        _allInventoryItemsSo.Remove(item);
+	        }
+	        return removed;
         }
 
-        protected void AggregateInventorySlotsForItem(So_InventoryItem item)
+        protected bool AggregateInventorySlotsForItem(So_InventoryItem item)
         {
+	        if (!_initialized)
+	        {
+		        UnityEngine.Debug.LogError($"Cannot try to Aggregate item for uninitialized inventory of type {InventorySpecificType}.");
+		        return false;
+	        }
+
+	        if (_defaultOrNullItemSo == item)
+	        {
+		        UnityEngine.Debug.LogError($"Cannot aggregate default item from inventory of type {InventorySpecificType}.");
+		        return false;
+	        }
 	        // Merge all slots with same Items so that we do not use too many slots when few slots are enough
+	        List<IInventorySlotInfo> allItemSlotsInUse = gridUiInfo.GetAllSlotData().Where(x=> x.CurrItemSo.UniqueID == item.UniqueID).ToList(); // TODO: Might be wrong
 	        throw;
+	        throw new NotImplementedException();
         }
         
 #endregion functionalMethods
         
-        /*-------*-------*-------*-------*-------*-------*-------*-------*-------*/
-        /*-------*-------*-------*-------*       *-------*-------*-------*-------*/
-        /*-------*-------*-------*-------*-------*-------*-------*-------*-------*/
-        
-        
-        
-
-        /// <summary>
-        /// Try to add item anywhere, for actions like picking up from ground, <br/>
-        /// where the inventory is not visible so any slot can be used
-        /// </summary>
-        /// <param name="item">The item we want to add</param>
-        /// <returns>bool stating if item was added</returns>
-        public bool TryAddItem(SO_U item)
-        {
-            if (!_initialized)
-            {
-                Debug.LogError($"Cannot try to add item for uninitialized inventory of type {InventoryType}.");
-                return false;
-            }
-
-            if (_defaultOrNullItem == item)
-            {
-                Debug.LogError($"Cannot add default item to inventory of type {InventoryType}.");
-                return false;
-            }
-            
-            // we check if the same item is available and can be stacked
-            IEnumerable<T> sameItemSlots = slotItems.Where(x => x.ContainedItemData == item);
-            foreach (T sameItemSlot in sameItemSlots)
-            {
-                // we found a slot with the same item, we can add it here, keeping empty slots for other items
-                if (sameItemSlot.CurrentStackCount < sameItemSlot.ContainedItemData.maxStackCount)
-                {
-                    if (sameItemSlot.UpdateSlotData(sameItemSlot.ContainedItemData, sameItemSlot.CurrentStackCount + 1))
-                    {
-                        OnInventoryChanged?.Invoke();
-                        return true;
-                    }
-                    else
-                    {
-                        Debug.LogError($"We were expecting to be able to add item {item.name} to inventory of type {InventoryType} but something went wrong.", item);
-                        return false;
-                    }
-                }
-                // else continue to look for other slots with the same item
-            }
-
-            // Since we could not stack, we look for an empty slot
-            T emptySlot = slotItems.FirstOrDefault(x => x.ContainedItemData == _defaultOrNullItem);
-            if (emptySlot != null)
-            {
-                if (emptySlot.UpdateSlotData(item, 1))
-                {
-                    OnInventoryChanged?.Invoke();
-                    return true;
-                }
-                else
-                {
-                    Debug.LogError($"We were expecting to be able to add item {item.name} to inventory of type {InventoryType} but something went wrong.", item);
-                    return false;
-                }
-            }
-
-            return false;
-        }
-        
-        public bool TryAddItems(SO_U item, int itemCount)
-        {
-            if (!_initialized)
-            {
-                Debug.LogError($"Cannot try to remove item for uninitialized inventory of type {InventoryType}.");
-                return false;
-            }
-
-            if (_defaultOrNullItem == item)
-            {
-                Debug.LogError($"Cannot remove default item from inventory of type {InventoryType}.");
-                return false;
-            }
-            
-            int emptySlotCount = slotItems.Count(x => x.ContainedItemData == _defaultOrNullItem);
-            int sameItemSlotsCount = slotItems.Count(x => x.ContainedItemData == item);
-            int availableItemCountInInventory = slotItems.Where(x => x.ContainedItemData == item).Sum(x => x.CurrentStackCount);
-            int availableSpaceInSameItemSlots = sameItemSlotsCount * item.maxStackCount - availableItemCountInInventory;
-            int maxCountIfUsingEmptySlots = emptySlotCount * item.maxStackCount;
-            int maxInventoryAddCapacity = availableSpaceInSameItemSlots + maxCountIfUsingEmptySlots;
-            if (itemCount > maxInventoryAddCapacity)
-            {
-                Debug.LogWarning($"we can add {maxInventoryAddCapacity} items of type {item.name} but tried to add {itemCount} items.");
-                return false;
-            }
-
-            int itemsLeftToAdd = itemCount;
-            // add in same item slots first
-            foreach (T sameItemSlot in slotItems.Where(x => x.ContainedItemData == item && x.CurrentStackCount < x.ContainedItemData.maxStackCount))
-            {
-                int spaceInThisSlot = sameItemSlot.ContainedItemData.maxStackCount - sameItemSlot.CurrentStackCount;
-                if (itemsLeftToAdd <= spaceInThisSlot)
-                {
-                    // we can add all remaining items in this slot
-                    if (sameItemSlot.UpdateSlotData(sameItemSlot.ContainedItemData, sameItemSlot.CurrentStackCount + itemsLeftToAdd))
-                    {
-                        OnInventoryChanged?.Invoke();
-                        AggregateInventorySlotsForItem(item);
-                        return true;
-                    }
-                    else
-                    {
-                        Debug.LogError($"We were expecting to be able to add item {item.name} to inventory of type {InventoryType} but something went wrong.", item);
-                        return false;
-                    }
-                }
-                else
-                {
-                    // fill this slot and continue to next
-                    if (sameItemSlot.UpdateSlotData(sameItemSlot.ContainedItemData, sameItemSlot.ContainedItemData.maxStackCount))
-                    {
-                        itemsLeftToAdd -= spaceInThisSlot;
-                    }
-                    else
-                    {
-                        Debug.LogError($"We were expecting to be able to add item {item.name} to inventory of type {InventoryType} but something went wrong.", item);
-                        return false;
-                    }
-                }
-            }
-
-            if (itemsLeftToAdd > 0)
-            {
-                // add items in empty slots
-                foreach (T emptySlot in slotItems.Where(x => x.ContainedItemData == _defaultOrNullItem))
-                {
-                    if (itemsLeftToAdd <= item.maxStackCount)
-                    {
-                        // we can add all remaining items in this slot
-                        if (emptySlot.UpdateSlotData(item, itemsLeftToAdd))
-                        {
-                            OnInventoryChanged?.Invoke();
-                            AggregateInventorySlotsForItem(item);
-                            return true;
-                            // loop stops at return, so break is not needed
-                        }
-                        else
-                        {
-                            Debug.LogError($"We were expecting to be able to add item {item.name} to inventory of type {InventoryType} but something went wrong.", item);
-                            return false;
-                        }
-                    }
-                    else
-                    {
-                        if (emptySlot.UpdateSlotData(emptySlot.ContainedItemData, item.maxStackCount))
-                        {
-                            itemsLeftToAdd -= item.maxStackCount;
-                        }
-                        else
-                        {
-                            Debug.LogError($"We were expecting to be able to add item {item.name} to inventory of type {InventoryType} but something went wrong.", item);
-                            return false;
-                        }
-                    }
-                }
-            }
-
-            Debug.LogError($"We had the capacity to add {itemCount} items of type {item.name} but something went wrong.");
-            return false;
-        }
-
-        /// <summary>
-        /// Try to remove item from anywhere, for actions like unlocking a door using key from inventory, <br/>
-        /// where the inventory is not visible so any slot can be used
-        /// </summary>
-        /// <param name="item">The item we want to get from the inventory</param>
-        /// <returns>was the item removed from the inventory?</returns>
-        public bool TryRemoveItem(SO_U item)
-        {
-            if (!_initialized)
-            {
-                Debug.LogError($"Cannot try to remove item for uninitialized inventory of type {InventoryType}.");
-                return false;
-            }
-
-            if (_defaultOrNullItem == item)
-            {
-                Debug.LogError($"Cannot remove default item from inventory of type {InventoryType}.");
-                return false;
-            }
-
-            int sameItemSlotsCount;
-            T sameItemSlot = slotItems.FirstOrDefault(x => x.ContainedItemData == item);
-            if (sameItemSlot != null)
-            {
-                sameItemSlotsCount = sameItemSlot.CurrentStackCount;
-                // we found a slot with the same item, we can add it
-                if (sameItemSlotsCount >= 1)
-                {
-                    if (sameItemSlotsCount == 1)
-                    {
-                        sameItemSlot.ClearSlot();
-                    }
-                    else
-                    {
-                        if (!sameItemSlot.UpdateSlotData(sameItemSlot.ContainedItemData, sameItemSlotsCount - 1))
-                        {
-                            Debug.LogError($"We were expecting to be able to add item {item.name} to inventory of type {InventoryType} but something went wrong.", item);
-                            return false;
-                        }
-                    }
-
-                    AggregateInventorySlotsForItem(item);
-                    OnInventoryChanged?.Invoke();
-                    return true;
-                }
-            }
-            return false;
-        }
-
-        public bool TryRemoveItems(SO_U item, int itemCount)
-        {
-            Debug.LogError($"We have not implemented {nameof(TryRemoveItems)} in inventory of type {InventoryType} yet.");
-            return false;
-        }
-        
+/*
         /// <summary>
         /// after change of an item, we need to aggregate the slots to avoid fragmentation of same items across multiple slots
         /// </summary>
@@ -460,5 +285,6 @@ namespace TGL.RPG.Items.InventorySystem.Samples
                 }
             }
         }
+*/
     }
 }

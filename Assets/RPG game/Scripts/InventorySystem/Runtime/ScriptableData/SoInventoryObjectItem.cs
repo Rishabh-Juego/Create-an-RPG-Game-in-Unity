@@ -11,7 +11,7 @@ namespace TGL.RPG.Items.InventorySystem.Data
     [CreateAssetMenu(fileName = nameof(SoInventoryObjectItem), menuName = "Scriptable Objects/Inventory/" + nameof(SoInventoryObjectItem))]
     public class SoInventoryObjectItem : So_InventoryItem
     {
-        public override InventoryType InventoryType => InventoryType.Objects;
+        public override InventoryType InventorySpecificType => InventoryType.Objects;
         // inventoryType
         private void OnValidate()
         {
@@ -22,10 +22,10 @@ namespace TGL.RPG.Items.InventorySystem.Data
                 gameObjectType = GameObjectType.Inventory;
             }
 
-            if (inventoryType != InventoryType.Objects)
+            if (inventorySpecificType != InventoryType.Objects)
             {
                 Debug.Log($"Any ScriptableObject that inherits from {nameof(SoInventoryObjectItem)} must have its {nameof(InventoryType)} set to {nameof(InventoryType.Objects)}. fix the issue on {name}.", this);
-                inventoryType = InventoryType.Objects;
+                inventorySpecificType = InventoryType.Objects;
             }
         }
     }

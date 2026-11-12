@@ -7,7 +7,7 @@ namespace TGL.RPG.Items.InventorySystem.Samples
     {
         public ObjectInventoryGridUiInfo()
         {
-            inventoryType = InventoryType.Objects;
+	        inventorySpecificType = InventoryType.Objects;
         }
     }
 }

@@ -5,8 +5,8 @@ using UnityEngine;
 
 namespace TGL.RPG.Items.InventorySystem.Samples
 {
-    public class SpellPlayerInventoryService : InventoryPlayerService<SoInventorySpellItem, SpellSlotUiInfo> 
+    public class SpellPlayerInventoryService : InventoryPlayerService // <SoInventorySpellItem, SpellSlotUiInfo> 
     {
-        public override InventoryType InventoryType => InventoryType.Spells;
+        public InventoryType InventorySpecificType => InventoryType.Spells;
     }
 }

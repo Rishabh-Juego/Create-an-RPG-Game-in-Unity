@@ -23,7 +23,7 @@ namespace TGL.RPG.CommandPattern.Samples
         {
             Data = new AddItemToInventoryDto
             {
-                InventoryType = inventoryItemSo.InventoryType,
+                InventorySpecificType = inventoryItemSo.InventoryType,
                 InventoryItem = inventoryItemSo,
                 ItemCount = addCount
             };
@@ -34,7 +34,7 @@ namespace TGL.RPG.CommandPattern.Samples
             bool itemPickedUp = false;
             string returnMsg = string.Empty;
             
-            switch (Data.InventoryType)
+            switch (Data.InventorySpecificType)
             {
                 case InventoryType.Objects:
                     if (SLocator.GetSlGlobal.TryGet(out IInventoryService<SoInventoryObjectItem, ObjectSlotUiInfo> playerItemInventoryService))
@@ -49,7 +49,7 @@ namespace TGL.RPG.CommandPattern.Samples
                     }
                     else
                     {
-                        Debug.LogWarning($"No inventory service found for items when picking up {Data.InventoryItem.DisplayName} of type {Data.InventoryType}.", Data.InventoryItem.objectPrefab);
+                        Debug.LogWarning($"No inventory service found for items when picking up {Data.InventoryItem.DisplayName} of type {Data.InventorySpecificType}.", Data.InventoryItem.objectPrefab);
                     }
                     break;
                 case InventoryType.Magic:
@@ -65,7 +65,7 @@ namespace TGL.RPG.CommandPattern.Samples
                     }
                     else
                     {
-                        Debug.LogWarning($"No inventory service found for items when picking up {Data.InventoryItem.DisplayName} of type {Data.InventoryType}.", Data.InventoryItem.objectPrefab);
+                        Debug.LogWarning($"No inventory service found for items when picking up {Data.InventoryItem.DisplayName} of type {Data.InventorySpecificType}.", Data.InventoryItem.objectPrefab);
                     }
                     break;
                 case InventoryType.Spells:
@@ -81,7 +81,7 @@ namespace TGL.RPG.CommandPattern.Samples
                     }
                     else
                     {
-                        Debug.LogWarning($"No inventory service found for items when picking up {Data.InventoryItem.DisplayName} of type {Data.InventoryType}.", Data.InventoryItem.objectPrefab);
+                        Debug.LogWarning($"No inventory service found for items when picking up {Data.InventoryItem.DisplayName} of type {Data.InventorySpecificType}.", Data.InventoryItem.objectPrefab);
                     }
                     break;
             }

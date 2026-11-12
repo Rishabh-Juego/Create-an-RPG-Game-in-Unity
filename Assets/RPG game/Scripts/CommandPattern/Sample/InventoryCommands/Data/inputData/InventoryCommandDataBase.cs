@@ -10,6 +10,6 @@ namespace TGL.RPG.CommandPattern.Samples
     public abstract record InventoryCommandDataBase
     {
         public GameObjectType gameObjectType = GameObjectType.Inventory;
-        public InventoryType InventoryType { get; set; } // Mutable property
+        public InventoryType InventorySpecificType { get; set; } // Mutable property
     }
 }

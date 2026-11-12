@@ -11,7 +11,7 @@ namespace TGL.RPG.Items.InventorySystem
         // From ScriptableObject
         string ItemId { get; }
         public GameObjectType GameObjectType => GameObjectType.Inventory;
-        public InventoryType InventoryType { get; }
+        public InventoryType InventorySpecificType { get; }
         public So_InventoryItem EmptyItemSo { get; }
         public So_InventoryItem CurrItemSo { get; }
         string DisplayName { get; }

@@ -10,14 +10,14 @@ namespace TGL.RPG.Items.InventorySystem.Samples
     public abstract class InventoryGridUiInfo : IInventoryGridUiInfo
     {
 #region Variables
-        protected InventoryType inventoryType;
+        protected InventoryType inventorySpecificType;
         protected IInventorySlotInfo[] slotDataArray;
         protected int totSlotsCount;
         protected Dictionary<int, IInventorySlotInfo> slotDataDictionary = new Dictionary<int, IInventorySlotInfo>();
 #endregion Variables
 
 #region Properties
-        public InventoryType InventoryType => inventoryType;
+        public InventoryType InventorySpecificType => inventorySpecificType;
         public int TotSlotsCount => totSlotsCount;
 #endregion Properties
         
@@ -30,7 +30,7 @@ namespace TGL.RPG.Items.InventorySystem.Samples
         public virtual void InitializeData(int slotsCount, So_InventoryItem defaultOrNullItem)
         {
 	        totSlotsCount = slotsCount;
-            inventoryType = defaultOrNullItem.InventoryType;
+	        inventorySpecificType = defaultOrNullItem.InventorySpecificType;
             slotDataArray = new IInventorySlotInfo[slotsCount];
             for(int i=0; i < slotsCount; i++)
             {
@@ -55,7 +55,7 @@ namespace TGL.RPG.Items.InventorySystem.Samples
         public void DeInitialize()
         {
 	        totSlotsCount = 0;
-	        inventoryType = InventoryType.Undefined;
+	        inventorySpecificType = InventoryType.Undefined;
 	        int slotsCount = slotDataArray.Length;
 	        for(int i=0; i < slotsCount; i++)
 	        {
@@ -317,14 +317,82 @@ namespace TGL.RPG.Items.InventorySystem.Samples
 	        return addedInInventory;
         }
 
-        public bool RemoveItem(So_InventoryItem itemSo)
+        public virtual bool RemoveItem(So_InventoryItem itemSo)
         {
-	        throw;
+	        bool removedFromInventory = false;
+	        if (!CanRemoveItemsFromAnyExistingSlot(itemSo, 1))
+	        {
+		        return removedFromInventory;
+	        }
+
+	        for (int i = 0; i < slotDataArray.Length; i++)
+	        {
+		        if (slotDataArray[i].HasItem(itemSo))
+		        {
+			        if (slotDataArray[i].CurrentStackCount == 1)
+			        {
+				        slotDataArray[i].ClearSlot();
+			        }
+			        else
+			        {
+				        slotDataArray[i].UpdateSlotData(itemSo, slotDataArray[i].CurrentStackCount - 1);
+			        }
+			        removedFromInventory = true;
+			        break;
+		        }
+	        }
+
+	        if (!removedFromInventory)
+	        {
+		        throw new ArgumentException($"{nameof(RemoveItem)}() returned false, but {nameof(CanRemoveItemsFromAnyExistingSlot)} is true, something went wrong");
+	        }
+
+	        return removedFromInventory;
         }
         
-        public bool RemoveItems(So_InventoryItem itemSo, int quantity)
+        public virtual bool RemoveItems(So_InventoryItem itemSo, int origQuantity)
         {
-	        throw;
+	        int quantityLeft = origQuantity;
+	        bool removedFromInventory = false;
+	        if (!CanRemoveItemsWithinAvailableSlots(itemSo, quantityLeft))
+	        {
+		        return removedFromInventory;
+	        }
+
+	        for (int i = 0; i < slotDataArray.Length; i++)
+	        {
+		        if (slotDataArray[i].HasItem(itemSo))
+		        {
+			        if (slotDataArray[i].CurrentStackCount < quantityLeft)
+			        {
+				        quantityLeft -= slotDataArray[i].CurrentStackCount;
+				        slotDataArray[i].ClearSlot();
+			        }
+			        else if (slotDataArray[i].CurrentStackCount > quantityLeft)
+			        {
+				        slotDataArray[i].UpdateSlotData(itemSo, slotDataArray[i].CurrentStackCount - quantityLeft);
+				        quantityLeft = 0;
+			        }
+			        else
+			        {
+				        slotDataArray[i].ClearSlot();
+				        quantityLeft = 0;
+			        }
+				    removedFromInventory = true;
+
+			        if (quantityLeft == 0)
+			        {
+				        break;
+			        }
+		        }
+	        }
+
+	        if (!removedFromInventory || quantityLeft > 0)
+	        {
+		        throw new ArgumentException($"{nameof(RemoveItems)}() returned false, but {nameof(CanRemoveItemsWithinAvailableSlots)} is true, something went wrong");
+	        }
+
+	        return removedFromInventory;
         }
 #endregion InventoryActions
 

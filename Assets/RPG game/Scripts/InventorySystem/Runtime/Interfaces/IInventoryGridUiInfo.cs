@@ -9,7 +9,7 @@ namespace TGL.RPG.Items.InventorySystem
     {
 #region Properties
         GameObjectType ObjectType => GameObjectType.Inventory;
-        InventoryType InventoryType { get; }
+        InventoryType InventorySpecificType { get; }
         int TotSlotsCount { get; }
 #endregion Properties
         

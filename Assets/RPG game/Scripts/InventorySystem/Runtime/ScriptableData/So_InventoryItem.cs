@@ -15,10 +15,10 @@ namespace TGL.RPG.Items.InventorySystem.Data
         [FormerlySerializedAs("itemIcon")] public Sprite objectIcon;
         [FormerlySerializedAs("itemPrefab")] public GameObject objectPrefab;
         [FormerlySerializedAs("maxStackCount")] public int maxItemStackCount = 1;
-        [SerializeField] protected InventoryType inventoryType = InventoryType.Undefined; 
+        [SerializeField] protected InventoryType inventorySpecificType = InventoryType.Undefined; 
         
         public override GameObjectType ObjectType => GameObjectType.Inventory;
-        public virtual InventoryType InventoryType => InventoryType.Undefined;
+        public virtual InventoryType InventorySpecificType => inventorySpecificType;
 
         private void OnValidate()
         {

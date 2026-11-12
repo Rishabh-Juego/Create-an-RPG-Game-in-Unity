@@ -11,7 +11,7 @@ namespace TGL.RPG.Items.InventorySystem.Data
     [CreateAssetMenu(fileName = nameof(SoInventoryMagicItem), menuName = "Scriptable Objects/Inventory/" + nameof(SoInventoryMagicItem))]
     public class SoInventoryMagicItem : So_InventoryItem
     {
-        public override InventoryType InventoryType => InventoryType.Magic;
+        public override InventoryType InventorySpecificType => InventoryType.Magic;
         // inventoryType
         private void OnValidate()
         {
@@ -22,10 +22,10 @@ namespace TGL.RPG.Items.InventorySystem.Data
                 gameObjectType = GameObjectType.Inventory;
             }
 
-            if (inventoryType != InventoryType.Magic)
+            if (inventorySpecificType != InventoryType.Magic)
             {
-                Debug.Log($"Any ScriptableObject that inherits from {nameof(SoInventoryObjectItem)} must have its {nameof(InventoryType)} set to {nameof(InventoryType.Magic)}. fix the issue on {name}.", this);
-                inventoryType = InventoryType.Magic;
+                Debug.Log($"Any ScriptableObject that inherits from {nameof(SoInventoryMagicItem)} must have its {nameof(InventoryType)} set to {nameof(InventoryType.Magic)}. fix the issue on {name}.", this);
+                inventorySpecificType = InventoryType.Magic;
             }
         }
     }

@@ -11,7 +11,7 @@ namespace TGL.RPG.Items.InventorySystem
     {
         public ObjectSlotUiInfo()
         {
-            inventoryType = InventoryType.Objects;
+	        inventorySpecificType = InventoryType.Objects;
         }
     }
 }

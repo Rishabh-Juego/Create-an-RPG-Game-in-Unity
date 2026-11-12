@@ -11,7 +11,7 @@ namespace TGL.RPG.Items.InventorySystem
     {
         // variables
         protected string itemId;
-        protected InventoryType inventoryType;
+        protected InventoryType inventorySpecificType;
         protected string displayName;
         protected int maxSlotStackSize;
         protected int itemCount;
@@ -21,7 +21,7 @@ namespace TGL.RPG.Items.InventorySystem
 
         // properties
         public string ItemId => itemId;
-        public InventoryType InventoryType => inventoryType;
+        public InventoryType InventorySpecificType => inventorySpecificType;
         public string DisplayName => displayName;
         public bool IsStackable => maxSlotStackSize > 1;
         public int MaxSlotStackCount => maxSlotStackSize;
@@ -47,13 +47,13 @@ namespace TGL.RPG.Items.InventorySystem
 
         public bool SetSlotData(So_InventoryItem itemSo, int count)
         {
-            if (inventoryType != itemSo.InventoryType)
+            if (inventorySpecificType != itemSo.InventorySpecificType)
             {
-                Debug.LogError($"We have initialization issue: Tried to set '{itemId}'({inventoryType}) slot with mismatched inventory type '{itemSo.InventoryType}' for slot index: {slotIndex}");
+                Debug.LogError($"We have initialization issue: Tried to set '{itemId}'({inventorySpecificType}) slot with mismatched inventory type '{itemSo.InventorySpecificType}' for slot index: {slotIndex}");	
                 return false;
             }
             itemId = itemSo.UniqueID;
-            inventoryType = itemSo.InventoryType;
+            inventorySpecificType = itemSo.InventorySpecificType;
             displayName = itemSo.DisplayName;
             maxSlotStackSize = itemSo.maxItemStackCount;
             itemCount = count;
@@ -94,7 +94,7 @@ namespace TGL.RPG.Items.InventorySystem
         public virtual void ClearSlot()
         {
             itemId = _defaultScriptableItem.UniqueID;
-            inventoryType = _defaultScriptableItem.InventoryType;
+            inventorySpecificType = _defaultScriptableItem.InventorySpecificType;
             displayName = _defaultScriptableItem.DisplayName;
             maxSlotStackSize = _defaultScriptableItem.maxItemStackCount;
             _currentScriptableItem = _defaultScriptableItem;
@@ -109,7 +109,7 @@ namespace TGL.RPG.Items.InventorySystem
 
         public virtual bool HasItem(So_InventoryItem itemSo)
         {
-            return string.Equals(itemSo.UniqueID, itemId);
+            return string.Equals(itemSo.UniqueID, itemId) && itemCount > 0;
         }
     }
 }

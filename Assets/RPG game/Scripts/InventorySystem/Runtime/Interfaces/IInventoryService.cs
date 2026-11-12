@@ -34,6 +34,8 @@ namespace TGL.RPG.Items.InventorySystem
         /// Event to inform change in inventory data. As service manages it, data change is informed by the service
         /// </summary>
         public event Action<IInventoryGridUiInfo> OnInventoryDataChanged;
+        
+	    public InventoryType InventorySpecificType { get; } 
 #endregion Properties
 
 #region GenericMethods
