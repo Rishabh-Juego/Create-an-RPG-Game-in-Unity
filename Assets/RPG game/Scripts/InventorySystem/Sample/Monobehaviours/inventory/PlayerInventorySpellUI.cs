@@ -10,12 +10,12 @@ namespace TGL.RPG.Items.InventorySystem.Samples
     /// <summary>
     /// Small SubSection of main <see cref="PlayerInventoryHandler"/> to show inventory data for the player within <see cref="InventoryType.Spell"/> type.
     /// </summary>
-    public class PlayerInventorySpellUI : PlayerInventoryUI<SpellPlayerInventoryService, So_InventorySpellData, SpellSlotData, PlayerSlotSpellUI>  
+    public class PlayerInventorySpellUI : PlayerInventoryUI<SpellPlayerInventoryService, SoInventorySpellItem, SpellSlotUiInfo, PlayerSlotSpellUI>  
     {
         [SerializeField] private List<PlayerSlotSpellUI> allItemSlotsUI;
         protected override List<PlayerSlotSpellUI> AllSlotsUI => allItemSlotsUI;
         
-        public override SpellPlayerInventoryService Setup(So_InventorySpellData defaultOrNullItem)
+        public override SpellPlayerInventoryService Setup(SoInventorySpellItem defaultOrNullItem)
         {
             _inventoryService = new SpellPlayerInventoryService();
             Initialize(InventoryType.Spells, defaultOrNullItem);

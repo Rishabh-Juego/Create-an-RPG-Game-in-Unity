@@ -8,7 +8,7 @@ namespace TGL.RPG.CommandPattern.Samples
     /// </summary>
     public record AddItemToInventoryDto : InventoryCommandDataBase
     {
-        public So_InventoryData inventoryData { get; set; } // the object that is being added
+        public So_InventoryItem InventoryItem { get; set; } // the object that is being added
         public int ItemCount { get; set; }
     }
 }

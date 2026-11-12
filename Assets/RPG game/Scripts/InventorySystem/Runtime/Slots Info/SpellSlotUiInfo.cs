@@ -7,9 +7,9 @@ using UnityEngine;
 namespace TGL.RPG.Items.InventorySystem
 {
     [Serializable]
-    public class SpellSlotData : InventorySlotData
+    public class SpellSlotUiInfo : InventorySlotUiInfo
     {
-        public SpellSlotData()
+        public SpellSlotUiInfo()
         {
             inventoryType = InventoryType.Spells;
         }

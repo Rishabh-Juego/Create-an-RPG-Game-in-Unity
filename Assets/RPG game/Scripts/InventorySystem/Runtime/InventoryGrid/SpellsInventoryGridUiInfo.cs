@@ -4,9 +4,9 @@ using TGL.RPG.Items.InventorySystem.Samples;
 namespace RPG_Game.Items.InventorySystem.Samples
 {
     [Serializable]
-    public class SpellsInventoryGridData : InventoryGridData
+    public class SpellsInventoryGridUiInfo : InventoryGridUiInfo
     {
-        public SpellsInventoryGridData()
+        public SpellsInventoryGridUiInfo()
         {
             inventoryType = InventoryType.Spells;
         }

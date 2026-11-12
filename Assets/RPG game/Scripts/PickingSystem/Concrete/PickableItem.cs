@@ -4,6 +4,7 @@ using TGL.RPG.IdentityRegistry;
 using TGL.RPG.Items.InventorySystem.Data;
 using UnityEngine;
 using TGL.RPG.Items.PickingSystem;
+using UnityEngine.Serialization;
 
 namespace TGL.RPG.Items.PickingSystem.Samples
 {
@@ -14,20 +15,20 @@ namespace TGL.RPG.Items.PickingSystem.Samples
         [Header("Picking Animation Variables")]
         [SerializeField, Tooltip("The amount of distance it jumps in a single frame"), Range(0.1f, 0.9f)] private float moveStep = 0.5f;
         [SerializeField, Tooltip("The minimum distance this object gets to the target before disappearing"), Range(0.1f, 3f)] private float minCloseness = 0.2f;
-        [SerializeField, Tooltip("The scriptable Object that has all info about this model")] private So_InventoryData pickableData;
+        [FormerlySerializedAs("pickableData")] [SerializeField, Tooltip("The scriptable Object that has all info about this model")] private So_InventoryItem pickableItem;
         private Coroutine _moveTowardsPicker;
         #endregion Variables
 
         
         #region Interface_Methods
         
-        public string GetItemName() => pickableData.DisplayName;
+        public string GetItemName() => pickableItem.DisplayName;
         
         public Vector3 GetObjectPosition() => transform.position;
         
         public GameObject GetObject() => gameObject;
         
-        public So_UniqueScriptable GetObjectData() => pickableData;
+        public So_UniqueScriptable GetObjectData() => pickableItem;
         
         public int GetObjectCount() => count;
 

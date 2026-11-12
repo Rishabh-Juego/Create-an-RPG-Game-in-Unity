@@ -10,12 +10,12 @@ namespace TGL.RPG.Items.InventorySystem.Samples
     /// <summary>
     /// Small SubSection of main <see cref="PlayerInventoryHandler"/> to show inventory data for the player within <see cref="InventoryType.Magic"/> type.
     /// </summary>
-    public class PlayerInventoryMagicUI : PlayerInventoryUI<MagicPlayerInventoryService , So_InventoryMagicData, MagicSlotData, PlayerSlotMagicUI>
+    public class PlayerInventoryMagicUI : PlayerInventoryUI<MagicPlayerInventoryService , SoInventoryMagicItem, MagicSlotUiInfo, PlayerSlotMagicUI>
     {
         [SerializeField] private List<PlayerSlotMagicUI> allItemSlotsUI;
         protected override List<PlayerSlotMagicUI> AllSlotsUI => allItemSlotsUI;
         
-        public override MagicPlayerInventoryService Setup(So_InventoryMagicData defaultOrNullItem)
+        public override MagicPlayerInventoryService Setup(SoInventoryMagicItem defaultOrNullItem)
         {
             _inventoryService = new MagicPlayerInventoryService();
             Initialize(InventoryType.Magic, defaultOrNullItem);

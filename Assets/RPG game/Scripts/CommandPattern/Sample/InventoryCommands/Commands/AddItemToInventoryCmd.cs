@@ -13,18 +13,18 @@ namespace TGL.RPG.CommandPattern.Samples
         public AddItemToInventoryDto Data { get; }
         private InventoryResult _result;
         
-        public static InventoryResult CreateAndRun(So_InventoryData inventoryDataSO, int addCount)
+        public static InventoryResult CreateAndRun(So_InventoryItem inventoryItemSo, int addCount)
         {
-            AddItemToInventoryCmd command = new AddItemToInventoryCmd(inventoryDataSO, addCount);
+            AddItemToInventoryCmd command = new AddItemToInventoryCmd(inventoryItemSo, addCount);
             return command.Execute() as InventoryResult;
         }
         
-        private AddItemToInventoryCmd(So_InventoryData inventoryDataSO, int addCount)
+        private AddItemToInventoryCmd(So_InventoryItem inventoryItemSo, int addCount)
         {
             Data = new AddItemToInventoryDto
             {
-                InventoryType = inventoryDataSO.InventoryType,
-                inventoryData = inventoryDataSO,
+                InventoryType = inventoryItemSo.InventoryType,
+                InventoryItem = inventoryItemSo,
                 ItemCount = addCount
             };
         }
@@ -36,10 +36,10 @@ namespace TGL.RPG.CommandPattern.Samples
             
             switch (Data.InventoryType)
             {
-                case InventoryType.Items:
-                    if (SLocator.GetSlGlobal.TryGet(out IInventoryService<So_InventoryItemData, ItemSlotData> playerItemInventoryService))
+                case InventoryType.Objects:
+                    if (SLocator.GetSlGlobal.TryGet(out IInventoryService<SoInventoryObjectItem, ObjectSlotUiInfo> playerItemInventoryService))
                     {
-                        if (Data.inventoryData is So_InventoryItemData itemData)
+                        if (Data.InventoryItem is SoInventoryObjectItem itemData)
                         {
                             if (playerItemInventoryService.TryAddItems(itemData, Data.ItemCount))
                             {
@@ -49,13 +49,13 @@ namespace TGL.RPG.CommandPattern.Samples
                     }
                     else
                     {
-                        Debug.LogWarning($"No inventory service found for items when picking up {Data.inventoryData.DisplayName} of type {Data.InventoryType}.", Data.inventoryData.objectPrefab);
+                        Debug.LogWarning($"No inventory service found for items when picking up {Data.InventoryItem.DisplayName} of type {Data.InventoryType}.", Data.InventoryItem.objectPrefab);
                     }
                     break;
                 case InventoryType.Magic:
-                    if (SLocator.GetSlGlobal.TryGet(out IInventoryService<So_InventoryMagicData, MagicSlotData> playerMagicInventoryService))
+                    if (SLocator.GetSlGlobal.TryGet(out IInventoryService<SoInventoryMagicItem, MagicSlotUiInfo> playerMagicInventoryService))
                     {
-                        if (Data.inventoryData is So_InventoryMagicData magicData)
+                        if (Data.InventoryItem is SoInventoryMagicItem magicData)
                         {
                             if (playerMagicInventoryService.TryAddItems(magicData, Data.ItemCount))
                             {
@@ -65,13 +65,13 @@ namespace TGL.RPG.CommandPattern.Samples
                     }
                     else
                     {
-                        Debug.LogWarning($"No inventory service found for items when picking up {Data.inventoryData.DisplayName} of type {Data.InventoryType}.", Data.inventoryData.objectPrefab);
+                        Debug.LogWarning($"No inventory service found for items when picking up {Data.InventoryItem.DisplayName} of type {Data.InventoryType}.", Data.InventoryItem.objectPrefab);
                     }
                     break;
                 case InventoryType.Spells:
-                    if (SLocator.GetSlGlobal.TryGet(out IInventoryService<So_InventorySpellData, SpellSlotData> playerSpellInventoryService))
+                    if (SLocator.GetSlGlobal.TryGet(out IInventoryService<SoInventorySpellItem, SpellSlotUiInfo> playerSpellInventoryService))
                     {
-                        if (Data.inventoryData is So_InventorySpellData spellData)
+                        if (Data.InventoryItem is SoInventorySpellItem spellData)
                         {
                             if (playerSpellInventoryService.TryAddItems(spellData, Data.ItemCount))
                             {
@@ -81,7 +81,7 @@ namespace TGL.RPG.CommandPattern.Samples
                     }
                     else
                     {
-                        Debug.LogWarning($"No inventory service found for items when picking up {Data.inventoryData.DisplayName} of type {Data.InventoryType}.", Data.inventoryData.objectPrefab);
+                        Debug.LogWarning($"No inventory service found for items when picking up {Data.InventoryItem.DisplayName} of type {Data.InventoryType}.", Data.InventoryItem.objectPrefab);
                     }
                     break;
             }

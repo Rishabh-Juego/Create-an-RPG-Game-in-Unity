@@ -7,7 +7,7 @@ using UnityEngine;
 
 namespace TGL.RPG.Items.InventorySystem.Samples
 {
-    public abstract class PlayerInventoryUI<T, SO_T, U, V> : MonoBehaviour where T : IInventoryService<SO_T, U> where SO_T : So_InventoryData where U : InventorySlotData<SO_T> where V : PlayerSlotUI<U, SO_T>
+    public abstract class PlayerInventoryUI<T, SO_T, U, V> : MonoBehaviour where T : IInventoryService<SO_T, U> where SO_T : So_InventoryItem where U : InventorySlotUiInfo where V : PlayerSlotUI<U>
     {
         protected T _inventoryService;
         protected abstract List<V> AllSlotsUI { get; }
@@ -22,7 +22,7 @@ namespace TGL.RPG.Items.InventorySystem.Samples
             _defaultOrNullItem = defaultOrNullItem;
             
             _inventoryService.Initialize(AllSlotsUI.Count, defaultOrNullItem);
-            U[] allItemsData = _inventoryService.GetAllItems();
+            U[] allItemsData = _inventoryService.GetAllItemSlots();
             AssignSlotDataToUi(allItemsData);
         }
         

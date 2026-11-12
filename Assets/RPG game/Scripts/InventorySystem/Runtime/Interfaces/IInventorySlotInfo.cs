@@ -6,15 +6,16 @@ using UnityEngine;
 
 namespace TGL.RPG.Items.InventorySystem
 {
-    public interface IInventorySlotData
+    public interface IInventorySlotInfo
     {
         // From ScriptableObject
         string ItemId { get; }
-        public UniqueType UniqueType => UniqueType.Inventory;
+        public GameObjectType GameObjectType => GameObjectType.Inventory;
         public InventoryType InventoryType { get; }
-        public So_InventoryData EmptyItemSo { get; }
+        public So_InventoryItem EmptyItemSo { get; }
+        public So_InventoryItem CurrItemSo { get; }
         string DisplayName { get; }
-        int MaxStackCount { get; }
+        int MaxSlotStackCount { get; }
         bool HasData { get; }
         bool IsStackable { get; }
         bool IsEmpty { get; }
@@ -25,15 +26,15 @@ namespace TGL.RPG.Items.InventorySystem
         int SlotIndex { get; }
         
         // Events
-        event Action<IInventorySlotData, int> OnSlotDataChanged;
+        event Action<IInventorySlotInfo, int> OnSlotDataChanged;
         
         // generic methods
-        void Initialize(int index, So_InventoryData defaultScriptableItem);
-        bool SetSlotData(So_InventoryData itemData, int count);
-        bool UpdateSlotData(So_InventoryData itemData, int count);
+        void Initialize(int index, So_InventoryItem defaultScriptableItem);
+        bool SetSlotData(So_InventoryItem itemSo, int count);
+        bool UpdateSlotData(So_InventoryItem itemSo, int count);
         void ClearSlot();
         
         // functional methods
-        bool HasItem(So_InventoryData itemData);
+        bool HasItem(So_InventoryItem itemSo);
     }
 }

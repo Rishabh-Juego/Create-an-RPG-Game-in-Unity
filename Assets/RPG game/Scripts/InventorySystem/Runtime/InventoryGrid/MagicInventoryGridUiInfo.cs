@@ -4,9 +4,9 @@ using TGL.RPG.Items.InventorySystem.Samples;
 namespace RPG_Game.Items.InventorySystem.Samples
 {
     [Serializable]
-    public class MagicInventoryGridData : InventoryGridData
+    public class MagicInventoryGridUiInfo : InventoryGridUiInfo
     {
-        public MagicInventoryGridData()
+        public MagicInventoryGridUiInfo()
         {
             inventoryType = InventoryType.Magic;
         }

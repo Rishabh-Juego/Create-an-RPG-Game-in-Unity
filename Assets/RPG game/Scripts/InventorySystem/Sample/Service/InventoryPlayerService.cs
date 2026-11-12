@@ -9,32 +9,45 @@ namespace TGL.RPG.Items.InventorySystem.Samples
 {
     public abstract class InventoryPlayerService : IInventoryService
     {
-        #region Variables
-        protected IInventoryGridData gridData;
-        protected So_InventoryData _defaultOrNullItemSo;
-        protected List<So_InventoryData> _allInventoryItemsSo;
-        protected Dictionary<string, So_InventoryData> inventoryItemsDict = new Dictionary<string, So_InventoryData>();
+#region Variables
+        protected IInventoryGridUiInfo gridUiInfo;
+        protected So_InventoryItem _defaultOrNullItemSo;
+        protected List<So_InventoryItem> _allInventoryItemsSo; // TODO: Need to update the list when we add slots or update slots
+        protected Dictionary<string, So_InventoryItem> inventoryItemsDict = new Dictionary<string, So_InventoryItem>(); // TODO: Need to update the list when we add slots or update slots
         protected bool _initialized;
-        #endregion  Variables
-        
-        #region Properties
-        public IInventoryGridData InventoryData => gridData;
-        public So_InventoryData DefaultOrNullItemSo => _defaultOrNullItemSo;
-        public So_InventoryData[] AllInventoryItemsSo => _allInventoryItemsSo.ToArray();
-        public Dictionary<string, So_InventoryData> AllInventoryItemsDict => inventoryItemsDict;
-        public event Action<IInventoryGridData> OnInventoryDataChanged;
-        #endregion Properties
+#endregion  Variables
 
-        #region GenericMethods
-        public void Initialize(IInventoryGridData gridObj, int slotSize, So_InventoryData defaultOrNullItem)
+#region Properties
+        public IInventoryGridUiInfo InventoryInfo => gridUiInfo;
+        public So_InventoryItem DefaultOrNullItemSo => _defaultOrNullItemSo;
+        public So_InventoryItem[] AllInventoryItemsSo => _allInventoryItemsSo.ToArray();
+        public Dictionary<string, So_InventoryItem> AllInventoryItemsDict => inventoryItemsDict;
+        public Dictionary<So_InventoryItem, int> AllInventoryItemsCountDict => AllInventoryItemsSo.Distinct().ToDictionary(x => x, x => gridUiInfo.GetTotalItemCount(x));
+        public event Action<IInventoryGridUiInfo> OnInventoryDataChanged;
+#endregion Properties
+
+#region GenericMethods
+        public void Initialize(IInventoryGridUiInfo gridObj, int slotSize, So_InventoryItem defaultOrNullItem)
         {
-            gridData = gridObj; // gridData = Activator.CreateInstance<IInventoryGridData>();
+            gridUiInfo = gridObj; // gridData = Activator.CreateInstance<IInventoryGridData>();
+            gridUiInfo.InitializeData(slotSize, defaultOrNullItem);
             _defaultOrNullItemSo = defaultOrNullItem;
-            _allInventoryItemsSo = new List<So_InventoryData>();
-            inventoryItemsDict = new Dictionary<string, So_InventoryData>();
+            _allInventoryItemsSo = new List<So_InventoryItem>();
+            inventoryItemsDict = new Dictionary<string, So_InventoryItem>();
             
-            gridData.InitializeData(slotSize, defaultOrNullItem);
+            OnInventoryDataChanged?.Invoke(InventoryInfo);
             _initialized = true;
+        }
+
+        public void DeInitialize()
+        {
+	        _defaultOrNullItemSo = null;
+	        _allInventoryItemsSo = new List<So_InventoryItem>();
+	        inventoryItemsDict = new Dictionary<string, So_InventoryItem>();
+	        gridUiInfo.DeInitialize();
+	        gridUiInfo = null;
+	        _initialized = false;
+	        OnInventoryDataChanged?.Invoke(InventoryInfo);
         }
 
         public void ClearInventory()
@@ -44,17 +57,20 @@ namespace TGL.RPG.Items.InventorySystem.Samples
                 return;
             }
             
-            gridData.ClearInventory();
+            gridUiInfo.ClearInventory();
             _allInventoryItemsSo.Clear();
             inventoryItemsDict.Clear();
-            OnInventoryDataChanged?.Invoke(InventoryData);
+            OnInventoryDataChanged?.Invoke(InventoryInfo);
         }
-        
-        public IInventorySlotData[] GetAllItemData();
-        #endregion GenericMethods
-        
-        #region functionalMethods
-        public bool CanAddItem(So_InventoryData item)
+
+        public IInventorySlotInfo[] GetAllItemSlots()
+        {
+	        return gridUiInfo.GetAllSlotData();
+        }
+#endregion GenericMethods
+
+#region functionalMethods
+        public bool CanAddItem(So_InventoryItem item)
         {
             if (!_initialized)
             {
@@ -67,24 +83,23 @@ namespace TGL.RPG.Items.InventorySystem.Samples
                 Debug.LogError($"Cannot add default item to inventory of type {item.InventoryType}.");
                 return false;
             }
-
+            
             // if we have at least one empty slot, we can add the item as the count is 1
-            if (gridData.HasEmptySlot())
+            if (gridUiInfo.HasEmptySlot())
             {
-                return true;
+	            return true;
             }
             
             // if no empty slots, we check if the same item is available and can be stacked
-            if (gridData.CanStackItemInAnySlot(item, 1))
+            if (gridUiInfo.CanStackItemInAnyExistingSlot(item, 1))
             {
-                return true;
+	            return true;
             }
             
-            // if we cannot stack or no empty slots, we cannot add the item
             return false;
         }
 
-        public bool CanAddItems(So_InventoryData item, int count)
+        public bool CanAddItems(So_InventoryItem item, int count)
         {
             if (!_initialized)
             {
@@ -99,13 +114,13 @@ namespace TGL.RPG.Items.InventorySystem.Samples
             }
             
             // we check if the same item is available and can be stacked in all available slots
-            if (gridData.CanStackItemInExistingSlots(item, count))
+            if (gridUiInfo.CanStackItemInAllExistingSlots(item, count))
             {
                 return true;
             }
             
             // if we cannot stack in existing slots, we check if we can add items in existing as well as empty slots together
-            if (gridData.CanAddItemsWithinAvailableSlots(item, count))
+            if (gridUiInfo.CanAddItemsWithinAvailableSlots(item, count))
             {
                 return true;
             }
@@ -114,19 +129,69 @@ namespace TGL.RPG.Items.InventorySystem.Samples
             return false;
         }
 
-        public bool TryAddItem(So_InventoryData item)
+        public bool TryAddItem(So_InventoryItem item)
         {
             if (!CanAddItem(item))
             {
                 return false;
             }
-            gridData.AddItem(item);
-            return true;
+            
+            bool added = gridUiInfo.AddItem(item);
+            if (added && !_allInventoryItemsSo.Contains(item))
+            {
+	            _allInventoryItemsSo.Add(item);
+            }
+            return added;
         }
-        public bool TryAddItems(So_InventoryData item, int count);
-        public bool TryRemoveItem(So_InventoryData item);
-        public bool TryRemoveItems(So_InventoryData item, int count); 
-        #endregion functionalMethods
+
+        public bool TryAddItems(So_InventoryItem item, int count)
+        {
+	        if (!CanAddItems(item, count))
+	        {
+		        return false;
+	        }
+	        bool added = gridUiInfo.AddItems(item, count);
+	        if (added && !_allInventoryItemsSo.Contains(item))
+	        {
+		        _allInventoryItemsSo.Add(item);
+	        }
+	        return added;
+        }
+
+        public bool TryRemoveItem(So_InventoryItem item)
+        {
+	        if (!_initialized)
+	        {
+		        Debug.LogError($"Cannot try to remove item for uninitialized inventory of type {item.InventoryType}.");
+		        return false;
+	        }
+
+	        if (_defaultOrNullItemSo == item)
+	        {
+		        Debug.LogError($"Cannot remove default item from inventory of type {item.InventoryType}.");
+		        return false;
+	        }
+
+	        if (gridUiInfo.GetTotalItemCount(item) > 1)
+	        {
+		        return false;
+	        }
+
+	        throw;
+        }
+
+        public bool TryRemoveItems(So_InventoryItem item, int count)
+        {
+	        throw;
+        }
+
+        protected void AggregateInventorySlotsForItem(So_InventoryItem item)
+        {
+	        // Merge all slots with same Items so that we do not use too many slots when few slots are enough
+	        throw;
+        }
+        
+#endregion functionalMethods
         
         /*-------*-------*-------*-------*-------*-------*-------*-------*-------*/
         /*-------*-------*-------*-------*       *-------*-------*-------*-------*/

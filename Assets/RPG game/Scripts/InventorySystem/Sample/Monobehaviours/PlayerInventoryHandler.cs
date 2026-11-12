@@ -9,29 +9,29 @@ namespace TGL.RPG.Items.InventorySystem.Samples
 {
     public class PlayerInventoryHandler : MonoBehaviour
     {
-        [FormerlySerializedAs("playerItemInventoryUI")] [SerializeField] private PlayerInventoryItemUI playerInventoryItemUI;
-        [SerializeField] private So_InventoryItemData emptyItemSlotPrefab;
-        private IInventoryService<So_InventoryItemData, ItemSlotData> playerItemInventoryService;
+        [FormerlySerializedAs("playerItemInventoryUI")] [SerializeField] private PlayerInventoryObjectUI playerInventoryObjectUI;
+        [SerializeField] private SoInventoryObjectItem emptyObjectSlotPrefab;
+        private IInventoryService<SoInventoryObjectItem, ObjectSlotUiInfo> playerItemInventoryService;
         
         [FormerlySerializedAs("playerMagicInventoryUI")] [SerializeField] private PlayerInventoryMagicUI playerInventoryMagicUI;
-        [SerializeField] private So_InventoryMagicData emptyMagicSlotPrefab;
-        private IInventoryService<So_InventoryMagicData, MagicSlotData> playerMagicInventoryService;
+        [SerializeField] private SoInventoryMagicItem emptyMagicSlotPrefab;
+        private IInventoryService<SoInventoryMagicItem, MagicSlotUiInfo> playerMagicInventoryService;
         
         [FormerlySerializedAs("playerSpellInventoryUI")] [SerializeField] private PlayerInventorySpellUI playerInventorySpellUI;
-        [SerializeField] private So_InventorySpellData emptySpellSlotPrefab;
-        private IInventoryService<So_InventorySpellData, SpellSlotData> playerSpellInventoryService;
+        [SerializeField] private SoInventorySpellItem emptySpellSlotPrefab;
+        private IInventoryService<SoInventorySpellItem, SpellSlotUiInfo> playerSpellInventoryService;
         
         private void Awake()
         {
             // TODO: load from saved data when we have resume functionality, for now just create new empty inventories
             
             // create item inventory
-            playerItemInventoryService = playerInventoryItemUI.Setup(emptyItemSlotPrefab);
+            playerItemInventoryService = playerInventoryObjectUI.Setup(emptyObjectSlotPrefab);
             playerMagicInventoryService = playerInventoryMagicUI.Setup(emptyMagicSlotPrefab);
             playerSpellInventoryService = playerInventorySpellUI.Setup(emptySpellSlotPrefab);
             
             // register to listen for inventory changes
-            playerItemInventoryService.OnInventoryChanged += playerInventoryItemUI.UpdateUI;
+            playerItemInventoryService.OnInventoryChanged += playerInventoryObjectUI.UpdateUI;
             playerMagicInventoryService.OnInventoryChanged += playerInventoryMagicUI.UpdateUI;
             playerSpellInventoryService.OnInventoryChanged += playerInventorySpellUI.UpdateUI; 
             
@@ -44,7 +44,7 @@ namespace TGL.RPG.Items.InventorySystem.Samples
         private void OnDestroy()
         {
             // unregister from listening to inventory changes
-            playerItemInventoryService.OnInventoryChanged -= playerInventoryItemUI.UpdateUI;
+            playerItemInventoryService.OnInventoryChanged -= playerInventoryObjectUI.UpdateUI;
             playerMagicInventoryService.OnInventoryChanged -= playerInventoryMagicUI.UpdateUI;
             playerSpellInventoryService.OnInventoryChanged -= playerInventorySpellUI.UpdateUI;
             

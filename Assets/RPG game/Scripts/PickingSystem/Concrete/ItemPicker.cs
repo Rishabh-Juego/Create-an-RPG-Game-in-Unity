@@ -94,9 +94,9 @@ namespace TGL.RPG.Items.PickingSystem
 
         private void PickItem(IPickable item)
         {
-            if(item.GetObjectData() is not So_InventoryData inventoryData)
+            if(item.GetObjectData() is not So_InventoryItem inventoryData)
             {
-                Debug.LogError($"Cannot pick item as it is not of {nameof(So_InventoryData)} type.", item.GetObject());
+                Debug.LogError($"Cannot pick item as it is not of {nameof(So_InventoryItem)} type.", item.GetObject());
                 return;
             }
             

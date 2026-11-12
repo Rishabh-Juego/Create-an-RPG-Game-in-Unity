@@ -97,8 +97,7 @@ We tagged each player prefab with "Player" tag for easy identification in script
 
 #### Inventory
 We are using a simple inventory system.  
-> To do later : The inventory cannot be opened while in combat or when player is in movement and the time 
-> should stop when we open the inventory.   
+> To do later : The inventory cannot be opened while in combat or when player is in movement and the time should stop when we open the inventory.   
 
 
 We want to show an icon when an item is placed in the inventory, similarly, when an item is removed, we want to 

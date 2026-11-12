@@ -5,7 +5,7 @@ using UnityEngine;
 
 namespace TGL.RPG.Items.InventorySystem.Samples
 {
-    public class MagicPlayerInventoryService : InventoryPlayerService<So_InventoryMagicData, MagicSlotData> 
+    public class MagicPlayerInventoryService : InventoryPlayerService<SoInventoryMagicItem, MagicSlotUiInfo> 
     {
         public override InventoryType InventoryType => InventoryType.Magic;
     }

@@ -7,10 +7,10 @@ namespace TGL.RPG.IdentityRegistry
     {
         [Space(10), Header("Implement UniqueId"), Space(5)]
         protected string id;
-        [FormerlySerializedAs("itemType")] [SerializeField] protected UniqueType uniqueType = UniqueType.Undefined;
+        [FormerlySerializedAs("itemType")] [SerializeField] protected GameObjectType gameObjectType = GameObjectType.Undefined;
 
 
         public string UniqueID => id;
-        public virtual UniqueType UniqueType => uniqueType;
+        public virtual GameObjectType ObjectType => gameObjectType;
     }
 }

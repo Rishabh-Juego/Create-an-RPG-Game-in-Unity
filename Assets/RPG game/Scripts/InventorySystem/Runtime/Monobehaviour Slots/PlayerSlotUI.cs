@@ -9,52 +9,52 @@ using UnityEngine.UI;
 namespace TGL.RPG.Items.InventorySystem.Samples
 {
     // PlayerSlotMagicUI : PlayerSlotUI<MagicSlotData, So_InventoryMagicData>
-    public abstract class PlayerSlotUI<T, U> : MonoBehaviour where T : InventorySlotData<U> where U : So_InventoryData
+    public abstract class PlayerSlotUI<T> : MonoBehaviour where T : IInventorySlotInfo
     {
         [SerializeField] protected Image slotIcon;
         [SerializeField] protected TMP_Text slotName;
         [SerializeField] protected GameObject countGroup;
         [SerializeField] protected TMP_Text countText;
         
-        protected IInventorySlotData<U> _slotData;
+        protected IInventorySlotInfo _uiSlotInfo;
         private int itemCount;
 
         public void Initialize(T slotData)
         {
-            _slotData = slotData;
+            _uiSlotInfo = slotData;
             itemCount = 0;
             countText.text = itemCount.ToString("00");
-            _slotData.OnSlotDataChanged += UpdateReferences;
-            UpdateUI();
+            _uiSlotInfo.OnSlotDataChanged += UpdateReferences;
+            UpdateUI(slotData);
         }
         
         public void DeInitialize()
         {
-            if (_slotData != null)
+            if (_uiSlotInfo != null)
             {
-                _slotData.OnSlotDataChanged -= UpdateReferences;
+                _uiSlotInfo.OnSlotDataChanged -= UpdateReferences;
             }
         }
 
-        private void UpdateReferences(IInventorySlotData<U> dataRef, int newCount)
+        private void UpdateReferences(IInventorySlotInfo uiSlotRef, int newCount)
         {
-            if (dataRef is T concreteData)
+            if (uiSlotRef is T concreteData)
             {
-                _slotData = concreteData;
-                itemCount = dataRef.CurrentStackCount;
+                _uiSlotInfo = concreteData;
+                itemCount = uiSlotRef.CurrentStackCount;
                 itemCount = newCount;
-                UpdateUI();
+                UpdateUI(concreteData);
             }
             else
             {
-                Debug.LogError($"Slot Changed update came with type {dataRef.GetType().FullName}, but we were expecting type {typeof(T).FullName}", gameObject);
+                Debug.LogError($"Slot Changed update came with type {uiSlotRef.GetType().FullName}, but we were expecting type {typeof(T).FullName}", gameObject);
             }
         }
 
-        public void UpdateUI()
+        public void UpdateUI(T concreteData)
         {
-            slotIcon.sprite = _slotData.ContainedItemData.objectIcon;
-            slotName.text = _slotData.ContainedItemData.DisplayName;
+            slotIcon.sprite = concreteData.CurrItemSo.objectIcon;
+            slotName.text = concreteData.DisplayName;
             
             countGroup.SetActive(itemCount > 1);
             countText.text = itemCount.ToString("00");

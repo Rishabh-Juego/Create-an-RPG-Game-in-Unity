@@ -7,11 +7,11 @@ using UnityEngine;
 namespace TGL.RPG.Items.InventorySystem
 {
     [Serializable]
-    public class ItemSlotData : InventorySlotData
+    public class ObjectSlotUiInfo : InventorySlotUiInfo
     {
-        public ItemSlotData()
+        public ObjectSlotUiInfo()
         {
-            inventoryType = InventoryType.Items;
+            inventoryType = InventoryType.Objects;
         }
     }
 }
